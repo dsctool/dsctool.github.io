@@ -1,0 +1,600 @@
+<!--
+Good evening.
+FLLAZ is looking for engineers like you.
+Join us https://fllaz.site/
+ーーーーーーーーーーーーーーーーーーーーーーーー
+こんばんは。
+FLLAZはあなたのようなエンジニアを募集しています。
+ぜひご参加ください https://fllaz.site/
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="description" content="FLLAZ Raider">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#043c78">
+  <meta property="og:title" content="Raider">
+  <meta property="og:description" content="">
+  <meta property="og:site_name" content="FLLAZ">
+  <meta property="og:image" content="https://i.imgur.com/q8Hz1t8.png">
+  <link rel="icon" type="image/png" href="https://i.imgur.com/q8Hz1t8.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FLLAZ Raider</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* スクロールバーのスタイル */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #071027; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #063c83, #5aa8ff); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: linear-gradient(135deg, #1e40af, #2563eb); }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #020417, #071233);
+      color: #fff;
+      margin: 0; padding: 0;
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .card {
+      background: rgba(6, 12, 25, 0.95);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(2, 6, 23, 0.7),
+                  0 0 0 1px rgba(59,130,246,0.08);
+      width: 100%; max-width: 700px;
+      animation: fadeIn 1s ease;
+      overflow: auto; max-height: 95vh;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(96,165,250,0.12);
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    
+    @keyframes glow {
+      0% { box-shadow: 0 0 20px rgba(59,130,246,0.18); }
+      50% { box-shadow: 0 0 30px rgba(37,99,235,0.32); }
+      100% { box-shadow: 0 0 20px rgba(59,130,246,0.18); }
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      position: relative;
+    }
+    
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 25%;
+      width: 50%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #60a5fa, transparent);
+      border-radius: 2px;
+    }
+    
+    h2 {
+      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 10px;
+      font-weight: 700;
+      font-size: 2.2rem;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 10px rgba(59,130,246,0.2);
+    }
+    
+    .subtitle {
+      color: #9fbff7;
+      font-size: 0.9rem;
+      margin-bottom: 5px;
+    }
+    
+    .section {
+      margin-bottom: 25px;
+      background: rgba(10, 18, 34, 0.5);
+      padding: 15px;
+      border-radius: 12px;
+      border-left: 3px solid #3b82f6;
+    }
+    
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      color: #3b82f6;
+      font-weight: 600;
+    }
+    
+    .section-title i {
+      font-size: 1.1rem;
+    }
+    
+    label {
+      display: block;
+      margin-top: 15px;
+      font-size: 14px;
+      color: #dbeafe;
+      font-weight: 500;
+    }
+    
+    label:first-child {
+      margin-top: 0;
+    }
+
+    /* テキスト入力 */
+    input[type="text"], textarea {
+      width: 100%; padding: 12px; margin-top: 8px;
+      border-radius: 10px; border: 1px solid #123055;
+      background: #07102a; color: #e6f2ff;
+      font-family: 'Courier New', monospace; 
+      resize: vertical;
+      transition: all 0.3s;
+      font-size: 14px;
+    }
+    
+    input[type="text"]:focus, textarea:focus {
+      outline: none;
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 2px rgba(96,165,250,0.12);
+    }
+    
+    input[type="number"] {
+      padding: 8px; margin-top: 6px;
+      border-radius: 8px; border: 1px solid #123055;
+      background: #07102a; color: #e6f2ff;
+      font-family: monospace; appearance: none;
+      width: 100px;
+      transition: all 0.3s;
+    }
+    
+    input[type="number"]:focus {
+      outline: none;
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 2px rgba(96,165,250,0.12);
+    }
+    
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none; margin: 0;
+    }
+
+    /* ファイル入力のカスタムデザイン */
+    .file-input-container {
+      position: relative;
+      margin-top: 8px;
+    }
+    
+    .file-input-label {
+      display: block;
+      padding: 14px;
+      border: 2px dashed #11427a;
+      border-radius: 10px;
+      background: #07102a;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      color: #9fbff7;
+      font-size: 14px;
+    }
+    
+    .file-input-label:hover {
+      border-color: #60a5fa;
+      background: #0b1a36;
+      color: #60a5fa;
+    }
+    
+    .file-input-label i {
+      margin-right: 8px;
+      font-size: 1.2rem;
+    }
+    
+    .file-input-label.has-file {
+      border-color: #5cc2ff;
+      color: #5cc2ff;
+      background: rgba(92,194,255,0.06);
+    }
+    
+    #messageFile {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      cursor: pointer;
+    }
+    
+    .file-name {
+      margin-top: 5px;
+      font-size: 12px;
+      color: #60a5fa;
+      text-align: center;
+    }
+
+    /* フレックス行 */
+    .row {
+      display: flex; gap: 15px; align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .row > * { flex: none; }
+    .row label,
+    .row .checkbox-container { margin-top: 0; }
+
+    /* トグルスイッチ */
+    .checkbox-container {
+      display: flex; align-items: center; gap: 10px;
+      cursor: pointer; font-size: 14px; user-select: none;
+      margin-top: 10px;
+      padding: 8px 0;
+    }
+    
+    .checkbox-container input {
+      appearance: none; width: 50px; height: 26px;
+      background: #123055; border-radius: 25px;
+      position: relative; transition: all 0.3s ease;
+    }
+    
+    .checkbox-container:hover input { background: #13427a; }
+    
+    .checkbox-container input:focus {
+      outline: none; box-shadow: 0 0 0 3px rgba(96,165,250,0.12);
+    }
+    
+    .checkbox-container input::before {
+      content: ''; position: absolute;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: #e6f2ff; top: 3px; left: 3px;
+      transition: transform 0.3s cubic-bezier(.68,-.55,.27,1.55);
+    }
+    
+    .checkbox-container input:checked { 
+      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+    }
+    
+    .checkbox-container input:checked::before {
+      transform: translateX(24px);
+    }
+    
+    .checkbox-container span { 
+      transition: color 0.3s;
+      color: #cfe8ff;
+    }
+    
+    .checkbox-container input:checked + span {
+      color: #9ed1ff;
+      font-weight: 600;
+    }
+
+    /* ボタン */
+    button.primary {
+      margin-top: 25px; width: 100%; padding: 16px;
+      border: none; border-radius: 12px;
+      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+      color: #fff; font-weight: 700; font-size: 18px;
+      letter-spacing: 1px; cursor: pointer; position: relative;
+      overflow: hidden; transition: all 0.3s;
+      box-shadow: 0 5px 15px rgba(59,130,246,0.28);
+      text-transform: uppercase;
+    }
+    
+    button.primary:hover {
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(37,99,235,0.36);
+    }
+    
+    button.primary:active {
+      transform: translateY(0);
+      box-shadow: 0 3px 10px rgba(59,130,246,0.22);
+    }
+    
+    button.primary.loading {
+      color: #ffffffa2; pointer-events: none;
+      background: linear-gradient(135deg, #2b6fb0, #4b82c9);
+    }
+
+    button.secondary {
+      margin-top: 10px; padding: 10px 16px;
+      background: linear-gradient(135deg, #1e293b, #243b5a);
+      color: #fff; font-size: 14px; border: none; border-radius: 8px;
+      position: relative; overflow: hidden;
+      transition: all 0.3s;
+      font-weight: 600;
+    }
+    
+    button.secondary:hover {
+      background: linear-gradient(135deg, #243b5a, #2b4b7a);
+      transform: translateY(-1px);
+    }
+
+    /* 停止・退出ボタン強調 */
+    #stopSpam, #leaveBtn {
+      width: 48%; padding: 12px;
+      border: none; border-radius: 10px;
+      background: linear-gradient(135deg, #1e3a8a, #0f172a);
+      color: #fff; font-weight: 700; font-size: 14px;
+      letter-spacing: 0.5px; cursor: pointer; transition: all 0.3s;
+      margin-top: 15px;
+      box-shadow: 0 4px 12px rgba(14, 60, 120, 0.32);
+    }
+    
+    #stopSpam:hover, #leaveBtn:hover {
+      background: linear-gradient(135deg, #15327a, #071233);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(10, 40, 90, 0.44);
+    }
+    
+    #stopSpam:active, #leaveBtn:active {
+      transform: translateY(0);
+    }
+
+    .button-container {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    /* Advanced options (details) */
+    details { 
+      margin-top: 20px; 
+      background: rgba(10, 18, 34, 0.5);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    
+    summary { 
+      list-style: none; 
+      padding: 15px 20px; 
+      cursor: pointer; 
+      font-weight: 600; 
+      position: relative; 
+      margin-top: 0;
+      color: #60a5fa;
+      transition: all 0.3s;
+    }
+    
+    summary:hover {
+      background: rgba(96,165,250,0.06);
+    }
+    
+    summary::-webkit-details-marker { display: none; }
+    summary::marker { content: none; }
+    
+    summary::before { 
+      content: '▶'; 
+      position: absolute; 
+      left: 15px; 
+      top: 50%; 
+      transform: translateY(-50%); 
+      transition: transform 0.3s ease;
+      font-size: 0.8rem;
+    }
+    
+    details[open] > summary::before { 
+      transform: translateY(-50%) rotate(90deg);
+    }
+    
+    .detail-content { 
+      padding: 0 20px 15px 20px;
+      transform-origin: top center; 
+      transform: scaleY(0); 
+      opacity: 0; 
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    
+    details[open] .detail-content { 
+      transform: scaleY(1); 
+      opacity: 1;
+    }
+
+    #log { 
+      margin-top: 20px; 
+      padding: 15px; 
+      height: 150px; 
+      overflow-y: auto; 
+      background: #07102a; 
+      border-radius: 10px; 
+      font-family: 'Courier New', monospace; 
+      font-size: 13px; 
+      white-space: pre-wrap; 
+      resize: vertical;
+      border: 1px solid #0f2a55;
+    }
+    
+    .log-entry {
+      margin: 5px 0;
+      padding: 3px 0;
+      border-bottom: 1px solid rgba(16,36,64,0.4);
+    }
+    
+    .log-time {
+      color: #60a5fa;
+      font-weight: 600;
+    }
+    
+    .log-success { color: #5cc2ff; }
+    .log-error { color: #7ec0ff; }
+    .log-warning { color: #a3d8ff; }
+    .log-info { color: #9ed1ff; }
+    
+    @media (max-width: 768px) {
+      .card {
+        padding: 20px;
+        max-width: 100%;
+        border-radius: 15px;
+      }
+      
+      h2 { font-size: 1.8rem; }
+      
+      .row { flex-direction: column; align-items: stretch; }
+      .row label { width: 100%; }
+      
+      .button-container { flex-direction: column; }
+      #stopSpam, #leaveBtn { width: 100%; }
+      
+      input[type="number"] { width: 100%; }
+    }
+
+    small { 
+      color: #7eaaf7; 
+      font-size: 12px; 
+      display: block; 
+      margin-top: 5px;
+      font-style: italic;
+    }
+    
+    .example {
+      color: #98c9ff;
+      font-size: 12px;
+      margin-top: 3px;
+      font-family: 'Courier New', monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <h2>FLLAZ Raider</h2>
+      <div class="subtitle">Discord Raider</div>
+    </div>
+    
+    <form id="form">
+      <div class="section">
+        <div class="section-title">
+          <i class="fas fa-key"></i>
+          <span>使用token設定</span>
+        </div>
+        
+        <label>tokenリスト
+          <textarea id="tokens" rows="4" placeholder="tokenをカンマ、改行、またはスペースで区切って入力"></textarea>
+          <div class="example">例: MtMisg...</div>
+        </label>
+
+        <label>サーバーID
+          <input type="text" id="guildId" required placeholder="サーバーIDを入力">
+          <div class="example">例: 1234567890</div>
+        </label>
+
+        <label>チャンネルIDリスト
+          <textarea id="channelIds" rows="2" placeholder="チャンネルIDをカンマ、改行、またはスペースで区切って入力"></textarea>
+          <div class="example">例: 1111111111111111, 2222222222222222</div>
+        </label>
+        <button type="button" id="autoFillChannels" class="secondary">
+          <i class="fas fa-sync-alt"></i> チャンネル自動取得
+        </button>
+      </div>
+
+      <div class="section">
+        <div class="section-title">
+          <i class="fas fa-file-alt"></i>
+          <span>メッセージ設定</span>
+        </div>
+        
+        <label>メッセージファイル</label>
+        <div class="file-input-container">
+          <input type="file" id="messageFile" accept=".txt" required>
+          <label for="messageFile" class="file-input-label" id="fileInputLabel">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span>クリックしてテキストファイルを選択</span>
+          </label>
+        </div>
+        <div class="file-name" id="fileName">ファイルが選択されていません</div>
+        <small>選択したテキストファイルの内容全体が1つのメッセージとして送信されます</small>
+
+        <label class="checkbox-container">
+          <input type="checkbox" id="allmention" checked>
+          <span>@everyoneを追加</span>
+        </label>
+        
+        <label class="checkbox-container">
+          <input type="checkbox" id="randomize">
+          <span>メッセージをランダマイズ（UUID追加）</span>
+        </label>
+        
+        <div class="row">
+          <label>送信間隔
+            <input type="number" id="delay" min="0" step="0.1" placeholder="0"> 秒
+          </label>
+          <label>送信上限
+            <input type="number" id="limit" min="1" step="1" placeholder="無制限"> 回
+          </label>
+        </div>
+      </div>
+
+      <details>
+        <summary><i class="fas fa-users"></i> メンション設定</summary>
+        <div class="detail-content">
+          <label>メンションするユーザーIDリスト
+            <textarea id="mentionIds" rows="2" placeholder="ユーザーIDをカンマ、改行、またはスペースで区切って入力"></textarea>
+            <div class="example">例: 1111111111111111, 2222222222222222</div>
+          </label>
+          <button type="button" id="fetchMentions" class="secondary">
+            <i class="fas fa-user-friends"></i> メンション自動取得
+          </button>
+        </div>
+      </details>
+
+      <details>
+        <summary><i class="fas fa-poll"></i> 投票設定</summary>
+        <div class="detail-content">
+          <label>投票タイトル
+            <input type="text" id="pollTitle" placeholder="投票のタイトルを入力">
+          </label>
+          <label>投票選択肢
+            <textarea id="pollAnswers" rows="2" placeholder="選択肢をカンマ、改行、またはスペースで区切って入力"></textarea>
+            <div class="example">例: 選択肢1, 選択肢2, 選択肢3</div>
+          </label>
+        </div>
+      </details>
+
+      <button id="submitBtn" type="submit" class="primary" disabled>
+        <i class="fas fa-play"></i> 実行開始
+      </button>
+    </form>
+    
+    <div class="button-container">
+      <button id="stopSpam" class="secondary" disabled>
+        <i class="fas fa-stop"></i> 送信停止
+      </button>
+      <button id="leaveBtn" class="secondary">
+        <i class="fas fa-sign-out-alt"></i> サーバー退出
+      </button>
+    </div>
+
+    <div id="log"></div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    // ファイル選択のUI改善
+    document.getElementById('messageFile').addEventListener('change', function(e) {
+      const fileName = this.files[0] ? this.files[0].name : 'ファイルが選択されていません';
+      const label = document.getElementById('fileInputLabel');
+      const nameDisplay = document.getElementById('fileName');
+      
+      nameDisplay.textContent = fileName;
+      
+      if (this.files[0]) {
+        label.classList.add('has-file');
+        nameDisplay.style.color = '#5cc2ff';
+      } else {
+        label.classList.remove('has-file');
+        nameDisplay.style.color = '#60a5fa';
+      }
+    });
+  </script>
+</body>
+</html>
