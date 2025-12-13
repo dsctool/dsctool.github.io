@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Discord Bot送信</title>
+</head>
+<body>
+  <h1>Discord Botでメッセージ送信</h1>
+  <input id="token" type="text" placeholder="Bot Tokenを入力"><br>
+  <input id="channel" type="text" placeholder="Channel IDを入力"><br>
+  <input id="message" type="text" placeholder="メッセージを入力"><br>
+  <button onclick="sendMessage()">送信</button>
+
+  <script>
+    async function sendMessage() {
+      const token = document.getElementById("token").value;
+      const channel = document.getElementById("channel").value;
+      const message = document.getElementById("message").value;
+
+      const res = await fetch(`https://discord.com/api/v10/channels/${channel}/messages`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bot ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ content: message })
+      });
+
+      if (res.ok) {
+        alert("送信成功！");
+      } else {
+        alert("送信失敗...");
+      }
+    }
+  </script>
+</body>
+</html>
