@@ -2,36 +2,32 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>Discord Bot送信</title>
+  <title>Discord Bot送信ツール</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Discord Botでメッセージ送信</h1>
-  <input id="token" type="text" placeholder="Bot Tokenを入力"><br>
-  <input id="channel" type="text" placeholder="Channel IDを入力"><br>
-  <input id="message" type="text" placeholder="メッセージを入力"><br>
-  <button onclick="sendMessage()">送信</button>
+  <div class="container">
+    <h1>Discord Bot メッセージ送信</h1>
+    <form id="discordForm">
+      <label for="token">🔑 Bot Token</label>
+      <input id="token" type="password" placeholder="Bot Tokenを入力" required>
 
-  <script>
-    async function sendMessage() {
-      const token = document.getElementById("token").value;
-      const channel = document.getElementById("channel").value;
-      const message = document.getElementById("message").value;
+      <label for="channel">📢 Channel ID</label>
+      <input id="channel" type="text" placeholder="Channel IDを入力" required>
 
-      const res = await fetch(`https://discord.com/api/v10/channels/${channel}/messages`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bot ${token}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ content: message })
-      });
+      <label for="message">💬 メッセージ</label>
+      <textarea id="message" placeholder="送信するメッセージを入力" required></textarea>
 
-      if (res.ok) {
-        alert("送信成功！");
-      } else {
-        alert("送信失敗...");
-      }
-    }
-  </script>
+      <button type="submit">🚀 送信</button>
+    </form>
+
+    <div id="progress" class="progress hidden">
+      <div class="bar"></div>
+    </div>
+
+    <div id="notification" class="notification hidden"></div>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
