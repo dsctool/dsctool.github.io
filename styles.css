@@ -1,13 +1,14 @@
 body {
   font-family: "Segoe UI", sans-serif;
   margin: 0;
-  background: #f9f9f9;
-  color: #333;
+  background: #1e1e2f;
+  color: #f5f5f5;
 }
 
 header {
-  background: #4a90e2;
-  color: white;
+  background: #2c2f48;
+  color: #f5f5f5;
+  border-bottom: 2px solid #5865F2;
 }
 
 .navbar {
@@ -19,6 +20,7 @@ header {
 
 .navbar h1 {
   margin: 0;
+  color: #5865F2;
 }
 
 .navbar ul {
@@ -30,13 +32,14 @@ header {
 }
 
 .navbar a {
-  color: white;
+  color: #f5f5f5;
   text-decoration: none;
   font-weight: bold;
+  transition: color 0.2s;
 }
 
 .navbar a:hover {
-  text-decoration: underline;
+  color: #5865F2;
 }
 
 .tools {
@@ -47,21 +50,24 @@ header {
 }
 
 .tool-card {
-  background: white;
+  background: #2c2f48;
   border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
   padding: 1.5rem;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, border 0.2s;
+  border: 1px solid transparent;
 }
 
 .tool-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(88,101,242,0.6);
+  border: 1px solid #5865F2;
 }
 
 footer {
   text-align: center;
   padding: 1rem;
-  background: #eee;
+  background: #2c2f48;
+  color: #aaa;
 }
