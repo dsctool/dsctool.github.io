@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Webhook スパマー</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #202225; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb { background: #5865f2; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #7289da; }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg,#2f3136,#1e1f22);
+      color:#fff;
+      margin:0; padding:0;
+      display:flex; justify-content:center; align-items:center;
+      height:100vh;
+    }
+    .card {
+      background:#36393f;
+      padding:32px;
+      border-radius:20px;
+      box-shadow:0 15px 35px rgba(0,0,0,.5);
+      width:100%; max-width:600px;
+      animation:fadeIn .8s ease;
+      overflow:auto; max-height:95vh;
+    }
+    @keyframes fadeIn {
+      from { opacity:0; transform:translateY(20px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    h2 { color:#adb8ff; text-align:center; margin:0 0 24px; font-weight:600; }
+    label { display:block; margin-top:18px; font-size:14px; }
+
+    /* 入力欄 */
+    input[type="text"], textarea {
+      width:100%; padding:10px; margin-top:6px;
+      border-radius:8px; border:none;
+      background:#202225; color:#fff;
+      font-family:monospace; resize:vertical;
+    }
+    textarea { min-height:60px; overflow-y:auto; }
+    .button-container {
+      display:flex; gap:10px; justify-content:center; margin-top:24px;
+    }
+    /* ボタン */
+    button.primary {
+      margin-top:24px; width:50%; padding:14px;
+      border:none; border-radius:14px;
+      background:linear-gradient(135deg,#6d75ff,#5865f2);
+      color:#fff; font-weight:700; font-size:18px;
+      letter-spacing:.5px; cursor:pointer; position:relative;
+      box-shadow:
+        0 4px 15px rgba(88,101,242,.4),
+        0 0 10px rgba(255,255,255,.1),
+        inset 0 0 5px rgba(255,255,255,.2);
+      overflow:hidden; transition:all .3s;
+    }
+    button.primary:hover {
+      background:linear-gradient(135deg,#7d89ff,#4e57e0);
+      box-shadow:
+        0 6px 22px rgba(88,101,242,.6),
+        0 0 24px rgba(255,255,255,.2),
+        inset 0 0 10px rgba(255,255,255,.3);
+      transform:scale(1.03);
+    }
+    button.primary:active {
+      transform:scale(0.96);
+      box-shadow:inset 0 4px 6px rgba(0,0,0,.3);
+    }
+    button.primary.loading {
+      color:#fff; pointer-events:none;
+    }
+    button.secondary {
+      margin-top:24px; width:50%; padding:14px;
+      border:none; border-radius:14px;
+      background:linear-gradient(135deg,#e74c3c,#c0392b);
+      color:#fff; font-weight:700; font-size:18px;
+      letter-spacing:.5px; cursor:pointer; position:relative;
+      box-shadow:
+        0 4px 15px rgba(236,81,81,.4),
+        0 0 10px rgba(255,255,255,.1),
+        inset 0 0 5px rgba(255,255,255,.2);
+      overflow:hidden; transition:all .3s;
+    }
+    button.secondary:hover {
+      background:linear-gradient(135deg,#c0392b,#e74c3c);
+      box-shadow:
+        0 6px 22px rgba(236,81,81,.6),
+        0 0 24px rgba(255,255,255,.2),
+        inset 0 0 10px rgba(255,255,255,.3);
+      transform:scale(1.03);
+    }
+    button.secondary:active {
+      transform:scale(0.96);
+      box-shadow:inset 0 4px 6px rgba(0,0,0,.3);
+    }
+
+    #log { margin-top:20px; padding:10px; height:120px; overflow-y:auto; background:#202225; border-radius:10px; font-family:monospace; font-size:12px; white-space:pre-wrap; }
+
+    @media (max-width: 600px) {
+      .card { padding:16px; max-width:95%; border-radius:10px; }
+      h2 { font-size:18px; margin-bottom:16px; }
+      label { font-size:13px; margin-top:12px; }
+      input[type="text"], textarea { padding:8px; font-size:12px; }
+      .button-container { flex-direction:column; gap:8px; }
+      button.primary, button.secondary { width:100%; font-size:16px; padding:10px; }
+      #log { height:80px; font-size:11px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Webhook Spammer</h2>
+    <form id="form">
+      <label>トークン
+        <input type="text" id="token" required placeholder="Webhook作成用のトークン">
+      </label>
+      <label>サーバーID
+        <input type="text" id="guildId" required placeholder="1362131922347622462">
+      </label>
+      <label>Webhook名
+        <input type="text" id="webhookName" placeholder="Captain Hook">
+      </label>
+      <label>メッセージ
+        <textarea id="message" placeholder="@everyone"></textarea>
+      </label>
+      <div class="button-container">
+        <button type="submit" id="submitBtn" class="primary">実行</button>
+        <button type="button" id="stopBtn" class="secondary">停止</button>
+      </div>
+    </form>
+    <div id="log"></div>
+  </div>
+  <script src="script.js"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"5185d1d6e63d4bd5800122b2e417eaa5","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
