@@ -56,11 +56,6 @@ Webhookを使用してスパムをします。Webhook再生権限がある場合
 
 [使用](raid.takkunlego0916.f5.si/webhook-spammer/)
 
-# ライセンス
-
-MIT License
-
-自由に改造・再配布してください。
 
 # 連絡
 
