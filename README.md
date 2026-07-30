@@ -9,24 +9,6 @@ Github Pages上で使用できるDiscord□らし関係のツール集です。
 
 ここからすべてのツールにアクセスできます。
 
-# 使用できるツール一覧
-
-**Raider**
-
-チャットスパムをしてテキストチャンネルを機能不全にします。
-
-[使用](raid.takkunlego0916.f5.si/Raider/)
-
-**Group DM Spammer**
-
-フレンドになったターゲットにグループスパムをします。
-
-[使用](raid.takkunlego0916.f5.si/group-dm-spammer/)
-
-**Invite Creater**
-
-上限が来るまで招待リンクを作成しつUtility Tools
-
 Github Pages上で使用できるDiscord□らし関係のツール集です。
 すべて HTML / CSS / JavaScript だけで作られており、インストール不要でどのデバイスからも仕様できます
 
@@ -36,7 +18,7 @@ Github Pages上で使用できるDiscord□らし関係のツール集です。
 
 ここからすべてのツールにアクセスできます。
 
-#　使用できるツール一覧
+# 使用できるツール一覧
 
 **Raider**
 
