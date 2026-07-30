@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reaction Spammer - ShadowTools</title>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'VT323', monospace;
+      background: #0d1117;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #c9d1d9;
+      background-image: 
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(57, 255, 20, 0.03) 2px,
+          rgba(57, 255, 20, 0.03) 4px
+        );
+    }
+    
+    .terminal {
+      width: 90%;
+      max-width: 700px;
+      background: #161b22;
+      border: 2px solid #39ff14;
+      border-radius: 10px;
+      box-shadow: 0 0 30px rgba(57, 255, 20, 0.2);
+      overflow: hidden;
+    }
+    
+    .terminal-header {
+      background: #21262d;
+      padding: 10px 20px;
+      border-bottom: 1px solid #39ff14;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ff5f56;
+    }
+    
+    .dot:nth-child(2) { background: #ffbd2e; }
+    .dot:nth-child(3) { background: #39ff14; }
+    
+    .terminal-title {
+      margin-left: auto;
+      color: #39ff14;
+      font-size: 1.2rem;
+    }
+    
+    .terminal-body {
+      padding: 30px;
+    }
+    
+    h1 {
+      color: #39ff14;
+      font-size: 2rem;
+      margin-bottom: 5px;
+      text-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+    }
+    
+    .subtitle {
+      color: #8b949e;
+      margin-bottom: 30px;
+      font-size: 1.1rem;
+    }
+    
+    .input-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      color: #39ff14;
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+    }
+    
+    input {
+      width: 100%;
+      padding: 12px;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 5px;
+      color: #39ff14;
+      font-family: 'VT323', monospace;
+      font-size: 1.1rem;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: #39ff14;
+      box-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
+    }
+    
+    .emoji-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .emoji-btn {
+      aspect-ratio: 1;
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1.5rem;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .emoji-btn:hover {
+      background: #39ff14;
+      transform: scale(1.1);
+    }
+    
+    .emoji-btn.selected {
+      background: #39ff14;
+      color: #000;
+      box-shadow: 0 0 15px rgba(57, 255, 20, 0.5);
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 15px;
+      background: #39ff14;
+      border: none;
+      border-radius: 5px;
+      color: #000;
+      font-family: 'VT323', monospace;
+      font-size: 1.3rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    
+    .btn:hover:not(:disabled) {
+      background: #2ecc71;
+      box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
+    }
+    
+    .btn:disabled {
+      background: #30363d;
+      color: #666;
+      cursor: not-allowed;
+    }
+    
+    .console {
+      margin-top: 20px;
+      padding: 15px;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 5px;
+      height: 150px;
+      overflow-y: auto;
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+    
+    .console-line {
+      margin: 3px 0;
+    }
+    
+    .prompt { color: #39ff14; }
+    .error { color: #ff5f56; }
+    .success { color: #2ecc71; }
+    
+    @media (max-width: 600px) {
+      .emoji-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="terminal">
+    <div class="terminal-header">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="terminal-title">reaction_bot.exe</div>
+    </div>
+    
+    <div class="terminal-body">
+      <h1>REACTION SPAMMER</h1>
+      <div class="subtitle">> Initialize mass reaction protocol</div>
+      
+      <form id="reactionForm">
+        <div class="input-group">
+          <label>> TOKEN</label>
+          <input type="password" id="token" placeholder="Enter token..." required>
+        </div>
+        
+        <div class="input-group">
+          <label>> CHANNEL_ID</label>
+          <input type="text" id="channelId" placeholder="Enter channel ID..." required>
+        </div>
+        
+        <div class="input-group">
+          <label>> MESSAGE_ID</label>
+          <input type="text" id="messageId" placeholder="Enter message ID..." required>
+        </div>
+        
+        <div class="input-group">
+          <label>> SELECT_EMOJI</label>
+          <div class="emoji-grid">
+            <button type="button" class="emoji-btn selected" data-emoji="👍">👍</button>
+            <button type="button" class="emoji-btn" data-emoji="👎">👎</button>
+            <button type="button" class="emoji-btn" data-emoji="😂">😂</button>
+            <button type="button" class="emoji-btn" data-emoji="😡">😡</button>
+            <button type="button" class="emoji-btn" data-emoji="❤️">❤️</button>
+            <button type="button" class="emoji-btn" data-emoji="💩">💩</button>
+            <button type="button" class="emoji-btn" data-emoji="🤡">🤡</button>
+            <button type="button" class="emoji-btn" data-emoji="🗿">🗿</button>
+          </div>
+          <input type="hidden" id="selectedEmoji" value="👍">
+        </div>
+        
+        <button type="submit" class="btn" id="startBtn">> EXECUTE_REACTION_SPAM</button>
+      </form>
+      
+      <div class="console" id="console">
+        <div class="console-line"><span class="prompt">$</span> System initialized...</div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    const API_BASE = 'https://discord.com/api/v9';
+    let selectedEmoji = '👍';
+    
+    document.querySelectorAll('.emoji-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedEmoji = btn.dataset.emoji;
+        document.getElementById('selectedEmoji').value = selectedEmoji;
+      });
+    });
+    
+    const log = (msg, type = 'prompt') => {
+      const console = document.getElementById('console');
+      const line = document.createElement('div');
+      line.className = 'console-line';
+      line.innerHTML = `<span class="${type}">$</span> ${msg}`;
+      console.appendChild(line);
+      console.scrollTop = console.scrollHeight;
+    };
+    
+    async function addReaction(channelId, messageId, emoji, token) {
+      const emojiEncoded = encodeURIComponent(emoji);
+      const response = await fetch(
+        `${API_BASE}/channels/${channelId}/messages/${messageId}/reactions/${emojiEncoded}/@me`,
+        {
+          method: 'PUT',
+          headers: {
+            'Authorization': token,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      return response;
+    }
+    
+    document.getElementById('reactionForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const token = document.getElementById('token').value;
+      const channelId = document.getElementById('channelId').value;
+      const messageId = document.getElementById('messageId').value;
+      const emoji = document.getElementById('selectedEmoji').value;
+      
+      const btn = document.getElementById('startBtn');
+      btn.disabled = true;
+      btn.textContent = '> SPAMMING...';
+      
+      log(`Starting reaction spam with ${emoji}...`, 'success');
+      
+      let count = 0;
+      const max = 20;
+      
+      const interval = setInterval(async () => {
+        if (count >= max) {
+          clearInterval(interval);
+          log('Reaction spam complete', 'success');
+          btn.disabled = false;
+          btn.textContent = '> EXECUTE_REACTION_SPAM';
+          return;
+        }
+        
+        try {
+          const res = await addReaction(channelId, messageId, emoji, token);
+          if (res.ok) {
+            count++;
+            log(`Reaction ${count}/${max} added`, 'prompt');
+          } else if (res.status === 429) {
+            log('Rate limited, waiting...', 'error');
+          } else {
+            log(`Error: ${res.status}`, 'error');
+          }
+        } catch (err) {
+          log(`Failed: ${err.message}`, 'error');
+        }
+      }, 500);
+    });
+  </script>
+</body>
+</html>
