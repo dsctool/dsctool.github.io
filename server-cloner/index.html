@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Server Cloner - ShadowTools</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="tool-container">
+    <div class="tool-header">
+      <h1><i class="fas fa-clone"></i> Server Cloner</h1>
+      <p>サーバーの構造を完全に複製</p>
+    </div>
+
+    <div class="tool-panel">
+      <div class="clone-layout">
+        <div class="source-panel">
+          <h3><i class="fas fa-download"></i> ソースサーバー</h3>
+          <div class="input-group">
+            <input type="text" id="sourceGuild" placeholder="コピー元サーバーID">
+            <button class="btn-secondary" onclick="analyzeSource()">
+              <i class="fas fa-search"></i> 分析
+            </button>
+          </div>
+          
+          <div class="source-info" id="sourceInfo" style="display: none;">
+            <div class="info-item">
+              <span>名前:</span>
+              <b id="sourceName">-</b>
+            </div>
+            <div class="info-item">
+              <span>チャンネル:</span>
+              <b id="sourceChannels">0</b>
+            </div>
+            <div class="info-item">
+              <span>ロール:</span>
+              <b id="sourceRoles">0</b>
+            </div>
+            <div class="info-item">
+              <span>絵文字:</span>
+              <b id="sourceEmojis">0</b>
+            </div>
+            <div class="info-item">
+              <span>メンバー:</span>
+              <b id="sourceMembers">0</b>
+            </div>
+          </div>
+        </div>
+
+        <div class="arrow-divider">
+          <i class="fas fa-arrow-right"></i>
+        </div>
+
+        <div class="target-panel">
+          <h3><i class="fas fa-upload"></i> ターゲットサーバー</h3>
+          <div class="input-group">
+            <input type="text" id="targetGuild" placeholder="コピー先サーバーID">
+          </div>
+          
+          <div class="target-options">
+            <label><input type="checkbox" id="clearExisting" checked> 既存チャンネルを削除</label>
+            <label><input type="checkbox" id="preservePerms" checked> パーミッションを保持</label>
+            <label><input type="checkbox" id="cloneMessages"> メッセージもコピー（遅延あり）</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="clone-options">
+        <h3><i class="fas fa-check-square"></i> コピーする項目</h3>
+        <div class="options-grid">
+          <label class="option-card">
+            <input type="checkbox" id="cloneChannels" checked>
+            <i class="fas fa-hashtag"></i>
+            <span>チャンネル</span>
+          </label>
+          <label class="option-card">
+            <input type="checkbox" id="cloneCategories" checked>
+            <i class="fas fa-folder"></i>
+            <span>カテゴリー</span>
+          </label>
+          <label class="option-card">
+            <input type="checkbox" id="cloneRoles" checked>
+            <i class="fas fa-user-tag"></i>
+            <span>ロール</span>
+          </label>
+          <label class="option-card">
+            <input type="checkbox" id="cloneEmojis">
+            <i class="fas fa-smile"></i>
+            <span>絵文字</span>
+          </label>
+          <label class="option-card">
+            <input type="checkbox" id="cloneWebhooks">
+            <i class="fas fa-webhook"></i>
+            <span>Webhook</span>
+          </label>
+          <label class="option-card">
+            <input type="checkbox" id="cloneBans">
+            <i class="fas fa-ban"></i>
+            <span>BANリスト</span>
+          </label>
+          <label class="option-card">
+            <input type="checkbox" id="cloneIcons">
+            <i class="fas fa-image"></i>
+            <span>アイコン</span>
+          </label>
+          <label class="option-card">
+            <input type="checkbox" id="cloneSplash">
+            <i class="fas fa-image"></i>
+            <span>スプラッシュ</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label><i class="fas fa-key"></i> 管理者トークン（両サーバーにアクセス可能）</label>
+        <textarea id="tokenList" placeholder="トークンを1行ずつ入力..."></textarea>
+      </div>
+
+      <div class="config-grid">
+        <div class="input-group">
+          <label><i class="fas fa-clock"></i> チャンネル作成遅延</label>
+          <input type="number" id="channelDelay" value="500">
+        </div>
+        <div class="input-group">
+          <label><i class="fas fa-clock"></i> メッセージコピー遅延</label>
+          <input type="number" id="messageDelay" value="100">
+        </div>
+        <div class="input-group">
+          <label><i class="fas fa-sort-numeric-up"></i> 並列作成数</label>
+          <input type="number" id="parallelChannels" value="3" min="1" max="10">
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button class="btn-primary btn-large" id="cloneBtn" onclick="startClone()" disabled>
+          <i class="fas fa-play"></i> クローン開始
+        </button>
+        <button class="btn-secondary" onclick="exportTemplate()">
+          <i class="fas fa-file-export"></i> テンプレート出力
+        </button>
+        <button class="btn-secondary" onclick="importTemplate()">
+          <i class="fas fa-file-import"></i> テンプレート読込
+        </button>
+      </div>
+
+      <div class="progress-panel">
+        <div class="progress-header">
+          <span id="progressStatus">待機中...</span>
+          <span id="progressPercent">0%</span>
+        </div>
+        <div class="progress-bar">
+          <div id="progressFill"></div>
+        </div>
+        <div class="progress-details">
+          <div class="detail-item">
+            <i class="fas fa-hashtag"></i>
+            <span>チャンネル: <b id="progressChannels">0/0</b></span>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-user-tag"></i>
+            <span>ロール: <b id="progressRoles">0/0</b></span>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-smile"></i>
+            <span>絵文字: <b id="progressEmojis">0/0</b></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="console-output" id="console"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'https://discord.com/api/v9';
+    let serverData = null;
+    let isCloning = false;
+
+    function log(message, type = 'info') {
+      const console = document.getElementById('console');
+      const time = new Date().toLocaleTimeString();
+      const div = document.createElement('div');
+      div.className = `log-entry log-${type}`;
+      div.innerHTML = `<span class="log-time">[${time}]</span> ${message}`;
+      console.appendChild(div);
+      console.scrollTop = console.scrollHeight;
+    }
+
+    async function analyzeSource() {
+      const guildId = document.getElementById('sourceGuild').value.trim();
+      const tokens = document.getElementById('tokenList').value.trim().split('\n').filter(t => t);
+      
+      if (!guildId || !tokens.length) {
+        log('サーバーIDとトークンを入力してください', 'error');
+        return;
+      }
+
+      log('ソースサーバーを分析中...', 'info');
+
+      try {
+        const token = tokens[0].split(':').pop().trim();
+        
+        // Get guild info
+        const guildRes = await fetch(`${API_BASE}/guilds/${guildId}`, {
+          headers: { 'Authorization': token }
+        });
+        
+        if (guildRes.ok) {
+          const guild = await guildRes.json();
+          
+          // Get channels
+          const channelsRes = await fetch(`${API_BASE}/guilds/${guildId}/channels`, {
+            headers: { 'Authorization': token }
+          });
+          const channels = channelsRes.ok ? await channelsRes.json() : [];
+          
+          // Get roles
+          const rolesRes = await fetch(`${API_BASE}/guilds/${guildId}/roles`, {
+            headers: { 'Authorization': token }
+          });
+          const roles = rolesRes.ok ? await rolesRes.json() : [];
+          
+          // Get emojis
+          const emojisRes = await fetch(`${API_BASE}/guilds/${guildId}/emojis`, {
+            headers: { 'Authorization': token }
+          });
+          const emojis = emojisRes.ok ? await emojisRes.json() : [];
+          
+          // Get members count
+          const membersRes = await fetch(`${API_BASE}/guilds/${guildId}?with_counts=true`, {
+            headers: { 'Authorization': token }
+          });
+          const memberCount = membersRes.ok ? (await membersRes.json()).approximate_member_count : 0;
+
+          serverData = {
+            guild,
+            channels,
+            roles,
+            emojis,
+            memberCount
+          };
+
+          // Update UI
+          document.getElementById('sourceName').textContent = guild.name;
+          document.getElementById('sourceChannels').textContent = channels.length;
+          document.getElementById('sourceRoles').textContent = roles.length;
+          document.getElementById('sourceEmojis').textContent = emojis.length;
+          document.getElementById('sourceMembers').textContent = memberCount;
+          document.getElementById('sourceInfo').style.display = 'block';
+          
+          document.getElementById('cloneBtn').disabled = false;
+          
+          log(`分析完了: ${guild.name}`, 'success');
+          log(`チャンネル: ${channels.length}, ロール: ${roles.length}, 絵文字: ${emojis.length}`, 'info');
+        } else {
+          log(`分析失敗: ${guildRes.status}`, 'error');
+        }
+      } catch (e) {
+        log(`エラー: ${e.message}`, 'error');
+      }
+    }
+
+    async function startClone() {
+      if (!serverData) {
+        log('先にソースサーバーを分析してください', 'error');
+        return;
+      }
+
+      const targetGuild = document.getElementById('targetGuild').value.trim();
+      const tokens = document.getElementById('tokenList').value.trim().split('\n').filter(t => t);
+      
+      if (!targetGuild || !tokens.length) {
+        log('ターゲットサーバーとトークンを入力してください', 'error');
+        return;
+      }
+
+      const options = {
+        channels: document.getElementById('cloneChannels').checked,
+        categories: document.getElementById('cloneCategories').checked,
+        roles: document.getElementById('cloneRoles').checked,
+        emojis: document.getElementById('cloneEmojis').checked,
+        webhooks: document.getElementById('cloneWebhooks').checked,
+        bans: document.getElementById('cloneBans').checked,
+        icons: document.getElementById('cloneIcons').checked,
+        clearExisting: document.getElementById('clearExisting').checked,
+        preservePerms: document.getElementById('preservePerms').checked
+      };
+
+      const delays = {
+        channel: parseInt(document.getElementById('channelDelay').value) || 500,
+        message: parseInt(document.getElementById('messageDelay').value) || 100
+      };
+
+      isCloning = true;
+      document.getElementById('cloneBtn').disabled = true;
+      
+      log('サーバークローンを開始します...', 'info');
+
+      const token = tokens[0].split(':').pop().trim();
+
+      // Clear existing if requested
+      if (options.clearExisting) {
+        log('既存チャンネルを削除中...', 'info');
+        const existingChannels = await fetch(`${API_BASE}/guilds/${targetGuild}/channels`, {
+          headers: { 'Authorization': token }
+        });
+        
+        if (existingChannels.ok) {
+          const channels = await existingChannels.json();
+          for (const ch of channels) {
+            await fetch(`${API_BASE}/channels/${ch.id}`, {
+              method: 'DELETE',
+              headers: { 'Authorization': token }
+            });
+            await new Promise(r => setTimeout(r, 300));
+          }
+        }
+      }
+
+      // Clone roles first
+      if (options.roles && serverData.roles) {
+        log('ロールをコピー中...', 'info');
+        document.getElementById('progressStatus').textContent = 'ロールをコピー中...';
+        
+        const roleMap = new Map();
+        
+        // Sort by position (highest first)
+        const sortedRoles = [...serverData.roles].sort((a, b) => b.position - a.position);
+        
+        for (const role of sortedRoles) {
+          if (role.name === '@everyone') continue;
+          
+          try {
+            const response = await fetch(`${API_BASE}/guilds/${targetGuild}/roles`, {
+              method: 'POST',
+              headers: {
+                'Authorization': token,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                name: role.name,
+                permissions: role.permissions,
+                color: role.color,
+                hoist: role.hoist,
+                mentionable: role.mentionable
+              })
+            });
+            
+            if (response.ok) {
+              const newRole = await response.json();
+              roleMap.set(role.id, newRole.id);
+              log(`ロール作成: ${role.name}`, 'success');
+            }
+          } catch (e) {
+            log(`ロール作成失敗: ${e.message}`, 'error');
+          }
+          
+          await new Promise(r => setTimeout(r, 300));
+        }
+        
+        serverData.roleMap = roleMap;
+      }
+
+      // Clone channels
+      if (options.channels && serverData.channels) {
+        log('チャンネルをコピー中...', 'info');
+        document.getElementById('progressStatus').textContent = 'チャンネルをコピー中...';
+        document.getElementById('progressChannels').textContent = `0/${serverData.channels.length}`;
+        
+        // First create categories
+        const categories = serverData.channels.filter(c => c.type === 4);
+        const categoryMap = new Map();
+        
+        for (const cat of categories) {
+          try {
+            const response = await fetch(`${API_BASE}/guilds/${targetGuild}/channels`, {
+              method: 'POST',
+              headers: {
+                'Authorization': token,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                name: cat.name,
+                type: 4,
+                permission_overwrites: options.preservePerms ? cat.permission_overwrites : []
+              })
+            });
+            
+            if (response.ok) {
+              const newCat = await response.json();
+              categoryMap.set(cat.id, newCat.id);
+              log(`カテゴリー作成: ${cat.name}`, 'success');
+            }
+          } catch (e) {
+            log(`カテゴリー作成失敗: ${e.message}`, 'error');
+          }
+          
+          await new Promise(r => setTimeout(r, delays.channel));
+        }
+
+        // Then create channels
+        const channels = serverData.channels.filter(c => c.type !== 4);
+        let createdCount = 0;
+        
+        for (const ch of channels) {
+          try {
+            const body = {
+              name: ch.name,
+              type: ch.type,
+              permission_overwrites: options.preservePerms ? ch.permission_overwrites : []
+            };
+            
+            if (ch.parent_id && categoryMap.has(ch.parent_id)) {
+              body.parent_id = categoryMap.get(ch.parent_id);
+            }
+            
+            // Map role permissions
+            if (body.permission_overwrites && serverData.roleMap) {
+              body.permission_overwrites = body.permission_overwrites.map(ow => ({
+                ...ow,
+                id: serverData.roleMap.get(ow.id) || ow.id
+              }));
+            }
+
+            const response = await fetch(`${API_BASE}/guilds/${targetGuild}/channels`, {
+              method: 'POST',
+              headers: {
+                'Authorization': token,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(body)
+            });
+            
+            if (response.ok) {
+              createdCount++;
+              log(`チャンネル作成: ${ch.name}`, 'success');
+            }
+          } catch (e) {
+            log(`チャンネル作成失敗: ${e.message}`, 'error');
+          }
+          
+          createdCount++;
+          document.getElementById('progressChannels').textContent = `${createdCount}/${serverData.channels.length}`;
+          document.getElementById('progressFill').style.width = `${(createdCount / serverData.channels.length) * 50}%`;
+          
+          await new Promise(r => setTimeout(r, delays.channel));
+        }
+      }
+
+      // Clone emojis
+      if (options.emojis && serverData.emojis) {
+        log('絵文字をコピー中...', 'info');
+        document.getElementById('progressStatus').textContent = '絵文字をコピー中...';
+        
+        for (const emoji of serverData.emojis) {
+          try {
+            // Download emoji
+            const emojiUrl = `https://cdn.discordapp.com/emojis/${emoji.id}.${emoji.animated ? 'gif' : 'png'}`;
+            const imgResponse = await fetch(emojiUrl);
+            const blob = await imgResponse.blob();
+            
+            const reader = new FileReader();
+            const base64 = await new Promise(resolve => {
+              reader.onloadend = () => resolve(reader.result);
+              reader.readAsDataURL(blob);
+            });
+            
+            // Upload to target
+            await fetch(`${API_BASE}/guilds/${targetGuild}/emojis`, {
+              method: 'POST',
+              headers: {
+                'Authorization': token,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                name: emoji.name,
+                image: base64
+              })
+            });
+            
+            log(`絵文字コピー: ${emoji.name}`, 'success');
+          } catch (e) {
+            log(`絵文字コピー失敗: ${e.message}`, 'error');
+          }
+          
+          await new Promise(r => setTimeout(r, 1000));
+        }
+      }
+
+      isCloning = false;
+      document.getElementById('cloneBtn').disabled = false;
+      document.getElementById('progressStatus').textContent = '完了';
+      document.getElementById('progressFill').style.width = '100%';
+      log('サーバークローン完了！', 'success');
+    }
+
+    function exportTemplate() {
+      if (!serverData) {
+        log('先にソースサーバーを分析してください', 'error');
+        return;
+      }
+
+      const template = {
+        name: serverData.guild.name,
+        channels: serverData.channels.map(c => ({
+          name: c.name,
+          type: c.type,
+          position: c.position
+        })),
+        roles: serverData.roles.map(r => ({
+          name: r.name,
+          color: r.color,
+          permissions: r.permissions
+        })),
+        exported_at: new Date().toISOString()
+      };
+
+      const blob = new Blob([JSON.stringify(template, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `server_template_${serverData.guild.id}.json`;
+      a.click();
+      
+      log('テンプレートをエクスポートしました', 'success');
+    }
+
+    function importTemplate() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = async (e) => {
+        const file = e.target.files[0];
+        const text = await file.text();
+        
+        try {
+          const template = JSON.parse(text);
+          log(`テンプレート読込: ${template.name}`, 'success');
+          // Would apply template to target server
+        } catch (err) {
+          log('無効なテンプレートファイル', 'error');
+        }
+      };
+      input.click();
+    }
+  </script>
+</body>
+</html>
