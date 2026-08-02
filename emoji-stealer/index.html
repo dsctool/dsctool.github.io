@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emoji Stealer - ShadowTools</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="tool-container">
+    <div class="tool-header">
+      <h1><i class="fas fa-smile"></i> Emoji Stealer</h1>
+      <p>他サーバーの絵文字をコピー</p>
+    </div>
+
+    <div class="tool-panel">
+      <div class="server-inputs">
+        <div class="input-group">
+          <label><i class="fas fa-download"></i> ソースサーバー（コピー元）</label>
+          <input type="text" id="sourceGuild" placeholder="サーバーID">
+          <button class="btn-secondary" onclick="fetchEmojis()">
+            <i class="fas fa-search"></i> 絵文字取得
+          </button>
+        </div>
+
+        <div class="input-group">
+          <label><i class="fas fa-upload"></i> ターゲットサーバー（コピー先）</label>
+          <input type="text" id="targetGuild" placeholder="サーバーID">
+        </div>
+      </div>
+
+      <div class="options-bar">
+        <label><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"> 全選択</label>
+        <label><input type="checkbox" id="includeAnimated" checked> アニメーション絵文字</label>
+        <label><input type="checkbox" id="keepNames" checked> 元の名前を保持</label>
+        <label><input type="checkbox" id="addPrefix"> プレフィックス追加</label>
+        <input type="text" id="prefix" placeholder="stolen_" style="width: 100px;">
+      </div>
+
+      <div class="emoji-grid" id="emojiGrid">
+        <div class="placeholder">
+          <i class="fas fa-smile-beam"></i>
+          <p>絵文字を取得するには「絵文字取得」ボタンをクリック</p>
+        </div>
+      </div>
+
+      <div class="emoji-stats" id="emojiStats" style="display: none;">
+        <span>選択: <b id="selectedCount">0</b></span>
+        <span>合計: <b id="totalCount">0</b></span>
+        <span>サイズ: <b id="totalSize">0 KB</b></span>
+      </div>
+
+      <div class="input-group">
+        <label><i class="fas fa-key"></i> トークン（ターゲットサーバーの管理者権限必須）</label>
+        <textarea id="tokenList" placeholder="トークンを1行ずつ入力..."></textarea>
+      </div>
+
+      <div class="config-grid">
+        <div class="input-group">
+          <label><i class="fas fa-clock"></i> アップロード遅延 (ms)</label>
+          <input type="number" id="uploadDelay" value="1000">
+        </div>
+        <div class="input-group">
+          <label><i class="fas fa-compress"></i> リサイズ</label>
+          <select id="resizeOption">
+            <option value="none">なし</option>
+            <option value="128">128px</option>
+            <option value="64">64px</option>
+            <option value="32">32px</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button class="btn-primary btn-large" id="stealBtn" onclick="startSteal()" disabled>
+          <i class="fas fa-copy"></i> コピー開始
+        </button>
+        <button class="btn-secondary" onclick="exportEmojis()">
+          <i class="fas fa-file-export"></i> エクスポート
+        </button>
+        <button class="btn-secondary" onclick="downloadAll()">
+          <i class="fas fa-download"></i> 全ダウンロード
+        </button>
+      </div>
+
+      <div class="progress-panel" id="progressPanel" style="display: none;">
+        <div class="progress-bar">
+          <div id="progressFill"></div>
+        </div>
+        <div class="progress-info">
+          <span>進捗: <b id="progressText">0/0</b></span>
+          <span>成功: <b id="successCount">0</b></span>
+          <span>失敗: <b id="failCount">0</b></span>
+        </div>
+      </div>
+
+      <div class="results-list" id="resultsList"></div>
+      <div class="console-output" id="console"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'https://discord.com/api/v9';
+    const CDN_BASE = 'https://cdn.discordapp.com';
+    let emojis = [];
+    let selectedEmojis = new Set();
+
+    function log(message, type = 'info') {
+      const console = document.getElementById('console');
+      const time = new Date().toLocaleTimeString();
+      const div = document.createElement('div');
+      div.className = `log-entry log-${type}`;
+      div.innerHTML = `<span class="log-time">[${time}]</span> ${message}`;
+      console.appendChild(div);
+      console.scrollTop = console.scrollHeight;
+    }
+
+    async function fetchEmojis() {
+      const guildId = document.getElementById('sourceGuild').value.trim();
+      const tokens = document.getElementById('tokenList').value.trim().split('\n').filter(t => t);
+      
+      if (!guildId || !tokens.length) {
+        log('サーバーIDとトークンを入力してください', 'error');
+        return;
+      }
+
+      log('絵文字を取得中...', 'info');
+
+      try {
+        const token = tokens[0].split(':').pop().trim();
+        const response = await fetch(`${API_BASE}/guilds/${guildId}/emojis`, {
+          headers: { 'Authorization': token }
+        });
+
+        if (response.ok) {
+          emojis = await response.json();
+          displayEmojis();
+          log(`${emojis.length}個の絵文字を取得しました`, 'success');
+        } else {
+          log(`取得失敗: ${response.status}`, 'error');
+        }
+      } catch (e) {
+        log(`エラー: ${e.message}`, 'error');
+      }
+    }
+
+    function displayEmojis() {
+      const grid = document.getElementById('emojiGrid');
+      const includeAnimated = document.getElementById('includeAnimated').checked;
+      
+      const filtered = includeAnimated ? emojis : emojis.filter(e => !e.animated);
+      
+      grid.innerHTML = filtered.map(emoji => `
+        <div class="emoji-item" onclick="toggleEmoji('${emoji.id}')" id="emoji-${emoji.id}">
+          <img src="${CDN_BASE}/emojis/${emoji.id}.${emoji.animated ? 'gif' : 'png'}" 
+               alt="${emoji.name}" 
+               title="${emoji.name}"
+               onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'">
+          <div class="emoji-name">:${emoji.name}:</div>
+          <div class="emoji-type">${emoji.animated ? 'GIF' : 'PNG'}</div>
+          <input type="checkbox" class="emoji-checkbox" 
+                 value="${emoji.id}" 
+                 style="display: none;"
+                 onchange="updateSelection('${emoji.id}', this.checked)">
+        </div>
+      `).join('');
+
+      document.getElementById('emojiStats').style.display = 'flex';
+      document.getElementById('totalCount').textContent = filtered.length;
+      document.getElementById('stealBtn').disabled = false;
+    }
+
+    function toggleEmoji(emojiId) {
+      const item = document.getElementById(`emoji-${emojiId}`);
+      const checkbox = item.querySelector('input[type="checkbox"]');
+      checkbox.checked = !checkbox.checked;
+      
+      if (checkbox.checked) {
+        item.classList.add('selected');
+        selectedEmojis.add(emojiId);
+      } else {
+        item.classList.remove('selected');
+        selectedEmojis.delete(emojiId);
+      }
+      
+      updateStats();
+    }
+
+    function updateSelection(emojiId, checked) {
+      const item = document.getElementById(`emoji-${emojiId}`);
+      if (checked) {
+        item.classList.add('selected');
+        selectedEmojis.add(emojiId);
+      } else {
+        item.classList.remove('selected');
+        selectedEmojis.delete(emojiId);
+      }
+      updateStats();
+    }
+
+    function toggleSelectAll() {
+      const selectAll = document.getElementById('selectAll').checked;
+      const checkboxes = document.querySelectorAll('.emoji-checkbox');
+      
+      checkboxes.forEach(cb => {
+        cb.checked = selectAll;
+        const emojiId = cb.value;
+        const item = document.getElementById(`emoji-${emojiId}`);
+        
+        if (selectAll) {
+          item.classList.add('selected');
+          selectedEmojis.add(emojiId);
+        } else {
+          item.classList.remove('selected');
+          selectedEmojis.delete(emojiId);
+        }
+      });
+      
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('selectedCount').textContent = selectedEmojis.size;
+    }
+
+    async function startSteal() {
+      const targetGuild = document.getElementById('targetGuild').value.trim();
+      const tokens = document.getElementById('tokenList').value.trim().split('\n').filter(t => t);
+      const delay = parseInt(document.getElementById('uploadDelay').value) || 1000;
+      const keepNames = document.getElementById('keepNames').checked;
+      const addPrefix = document.getElementById('addPrefix').checked;
+      const prefix = document.getElementById('prefix').value;
+
+      if (!targetGuild || !tokens.length || !selectedEmojis.size) {
+        log('ターゲットサーバー、トークン、絵文字を選択してください', 'error');
+        return;
+      }
+
+      document.getElementById('progressPanel').style.display = 'block';
+      document.getElementById('resultsList').innerHTML = '';
+
+      const selected = emojis.filter(e => selectedEmojis.has(e.id));
+      let success = 0, failed = 0;
+
+      log(`${selected.length}個の絵文字をコピーします...`, 'info');
+
+      for (let i = 0; i < selected.length; i++) {
+        const emoji = selected[i];
+        const token = tokens[i % tokens.length].split(':').pop().trim();
+
+        try {
+          // Download emoji
+          const emojiUrl = `${CDN_BASE}/emojis/${emoji.id}.${emoji.animated ? 'gif' : 'png'}`;
+          const imgResponse = await fetch(emojiUrl);
+          
+          if (!imgResponse.ok) {
+            throw new Error('Download failed');
+          }
+
+          const blob = await imgResponse.blob();
+          const reader = new FileReader();
+          
+          const base64 = await new Promise((resolve) => {
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsDataURL(blob);
+          });
+
+          // Upload to target
+          const name = (addPrefix ? prefix : '') + (keepNames ? emoji.name : `emoji_${i}`);
+          const response = await fetch(`${API_BASE}/guilds/${targetGuild}/emojis`, {
+            method: 'POST',
+            headers: {
+              'Authorization': token,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              name: name.substring(0, 32),
+              image: base64
+            })
+          });
+
+          const resultDiv = document.createElement('div');
+          resultDiv.className = 'result-item';
+
+          if (response.ok) {
+            success++;
+            resultDiv.className += ' success';
+            resultDiv.innerHTML = `
+              <img src="${emojiUrl}" width="32">
+              <span>:${name}:</span>
+              <i class="fas fa-check"></i>
+            `;
+            log(`絵文字コピー成功: ${name}`, 'success');
+          } else {
+            failed++;
+            resultDiv.className += ' error';
+            resultDiv.innerHTML = `
+              <img src="${emojiUrl}" width="32">
+              <span>:${name}:</span>
+              <i class="fas fa-times"></i> ${response.status}
+            `;
+            log(`コピー失敗: ${name} (${response.status})`, 'error');
+          }
+
+          document.getElementById('resultsList').appendChild(resultDiv);
+
+        } catch (e) {
+          failed++;
+          log(`エラー: ${e.message}`, 'error');
+        }
+
+        // Update progress
+        document.getElementById('progressText').textContent = `${i + 1}/${selected.length}`;
+        document.getElementById('successCount').textContent = success;
+        document.getElementById('failCount').textContent = failed;
+        document.getElementById('progressFill').style.width = `${((i + 1) / selected.length) * 100}%`;
+
+        await new Promise(r => setTimeout(r, delay));
+      }
+
+      log('絵文字コピー完了', 'success');
+    }
+
+    async function exportEmojis() {
+      if (!emojis.length) {
+        log('絵文字を取得してください', 'error');
+        return;
+      }
+
+      const data = emojis.map(e => ({
+        name: e.name,
+        url: `${CDN_BASE}/emojis/${e.id}.${e.animated ? 'gif' : 'png'}`,
+        animated: e.animated
+      }));
+
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'emojis.json';
+      a.click();
+      
+      log('絵文字リストをエクスポートしました', 'success');
+    }
+
+    async function downloadAll() {
+      const selected = emojis.filter(e => selectedEmojis.has(e.id));
+      
+      log(`${selected.length}個の絵文字をダウンロードします...`, 'info');
+      
+      for (const emoji of selected) {
+        const emojiUrl = `${CDN_BASE}/emojis/${emoji.id}.${emoji.animated ? 'gif' : 'png'}`;
+        const a = document.createElement('a');
+        a.href = emojiUrl;
+        a.download = `${emoji.name}.${emoji.animated ? 'gif' : 'png'}`;
+        a.click();
+        await new Promise(r => setTimeout(r, 100));
+      }
+      
+      log('ダウンロード完了', 'success');
+    }
+  </script>
+</body>
+</html>
