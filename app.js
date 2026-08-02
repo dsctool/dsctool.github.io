@@ -1,7 +1,3 @@
-// ============================================
-// ShadowTools v2.0 - Main Application
-// ============================================
-
 const ShadowApp = {
   // Configuration
   config: {
