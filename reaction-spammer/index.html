@@ -4,327 +4,320 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reaction Spammer - ShadowTools</title>
-  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: 'VT323', monospace;
-      background: #0d1117;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: #c9d1d9;
-      background-image: 
-        repeating-linear-gradient(
-          0deg,
-          transparent,
-          transparent 2px,
-          rgba(57, 255, 20, 0.03) 2px,
-          rgba(57, 255, 20, 0.03) 4px
-        );
-    }
-    
-    .terminal {
-      width: 90%;
-      max-width: 700px;
-      background: #161b22;
-      border: 2px solid #39ff14;
-      border-radius: 10px;
-      box-shadow: 0 0 30px rgba(57, 255, 20, 0.2);
-      overflow: hidden;
-    }
-    
-    .terminal-header {
-      background: #21262d;
-      padding: 10px 20px;
-      border-bottom: 1px solid #39ff14;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    
-    .dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #ff5f56;
-    }
-    
-    .dot:nth-child(2) { background: #ffbd2e; }
-    .dot:nth-child(3) { background: #39ff14; }
-    
-    .terminal-title {
-      margin-left: auto;
-      color: #39ff14;
-      font-size: 1.2rem;
-    }
-    
-    .terminal-body {
-      padding: 30px;
-    }
-    
-    h1 {
-      color: #39ff14;
-      font-size: 2rem;
-      margin-bottom: 5px;
-      text-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
-    }
-    
-    .subtitle {
-      color: #8b949e;
-      margin-bottom: 30px;
-      font-size: 1.1rem;
-    }
-    
-    .input-group {
-      margin-bottom: 20px;
-    }
-    
-    label {
-      display: block;
-      color: #39ff14;
-      margin-bottom: 8px;
-      font-size: 1.1rem;
-    }
-    
-    input {
-      width: 100%;
-      padding: 12px;
-      background: #0d1117;
-      border: 1px solid #30363d;
-      border-radius: 5px;
-      color: #39ff14;
-      font-family: 'VT323', monospace;
-      font-size: 1.1rem;
-    }
-    
-    input:focus {
-      outline: none;
-      border-color: #39ff14;
-      box-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
-    }
-    
-    .emoji-grid {
-      display: grid;
-      grid-template-columns: repeat(8, 1fr);
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    
-    .emoji-btn {
-      aspect-ratio: 1;
-      background: #21262d;
-      border: 1px solid #30363d;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 1.5rem;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .emoji-btn:hover {
-      background: #39ff14;
-      transform: scale(1.1);
-    }
-    
-    .emoji-btn.selected {
-      background: #39ff14;
-      color: #000;
-      box-shadow: 0 0 15px rgba(57, 255, 20, 0.5);
-    }
-    
-    .btn {
-      width: 100%;
-      padding: 15px;
-      background: #39ff14;
-      border: none;
-      border-radius: 5px;
-      color: #000;
-      font-family: 'VT323', monospace;
-      font-size: 1.3rem;
-      cursor: pointer;
-      transition: all 0.3s;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-    }
-    
-    .btn:hover:not(:disabled) {
-      background: #2ecc71;
-      box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
-    }
-    
-    .btn:disabled {
-      background: #30363d;
-      color: #666;
-      cursor: not-allowed;
-    }
-    
-    .console {
-      margin-top: 20px;
-      padding: 15px;
-      background: #0d1117;
-      border: 1px solid #30363d;
-      border-radius: 5px;
-      height: 150px;
-      overflow-y: auto;
-      font-size: 1rem;
-      line-height: 1.4;
-    }
-    
-    .console-line {
-      margin: 3px 0;
-    }
-    
-    .prompt { color: #39ff14; }
-    .error { color: #ff5f56; }
-    .success { color: #2ecc71; }
-    
-    @media (max-width: 600px) {
-      .emoji-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="../styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <div class="terminal">
-    <div class="terminal-header">
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="terminal-title">reaction_bot.exe</div>
+  <div class="tool-container">
+    <div class="tool-header">
+      <h1><i class="fas fa-heart"></i> Reaction Spammer</h1>
+      <p>自動リアクション追加・削除</p>
     </div>
-    
-    <div class="terminal-body">
-      <h1>REACTION SPAMMER</h1>
-      <div class="subtitle">> Initialize mass reaction protocol</div>
-      
-      <form id="reactionForm">
-        <div class="input-group">
-          <label>> TOKEN</label>
-          <input type="password" id="token" placeholder="Enter token..." required>
-        </div>
-        
-        <div class="input-group">
-          <label>> CHANNEL_ID</label>
-          <input type="text" id="channelId" placeholder="Enter channel ID..." required>
-        </div>
-        
-        <div class="input-group">
-          <label>> MESSAGE_ID</label>
-          <input type="text" id="messageId" placeholder="Enter message ID..." required>
-        </div>
-        
-        <div class="input-group">
-          <label>> SELECT_EMOJI</label>
-          <div class="emoji-grid">
-            <button type="button" class="emoji-btn selected" data-emoji="👍">👍</button>
-            <button type="button" class="emoji-btn" data-emoji="👎">👎</button>
-            <button type="button" class="emoji-btn" data-emoji="😂">😂</button>
-            <button type="button" class="emoji-btn" data-emoji="😡">😡</button>
-            <button type="button" class="emoji-btn" data-emoji="❤️">❤️</button>
-            <button type="button" class="emoji-btn" data-emoji="💩">💩</button>
-            <button type="button" class="emoji-btn" data-emoji="🤡">🤡</button>
-            <button type="button" class="emoji-btn" data-emoji="🗿">🗿</button>
-          </div>
-          <input type="hidden" id="selectedEmoji" value="👍">
-        </div>
-        
-        <button type="submit" class="btn" id="startBtn">> EXECUTE_REACTION_SPAM</button>
-      </form>
-      
-      <div class="console" id="console">
-        <div class="console-line"><span class="prompt">$</span> System initialized...</div>
+
+    <div class="tool-panel">
+      <div class="input-group">
+        <label><i class="fas fa-link"></i> メッセージリンク</label>
+        <input type="text" id="messageUrl" placeholder="https://discord.com/channels/...">
+        <button class="btn-secondary" onclick="parseMessageUrl()">
+          <i class="fas fa-extract"></i> 解析
+        </button>
       </div>
+
+      <div class="parsed-info" id="parsedInfo" style="display: none;">
+        <span>Guild: <b id="parsedGuild">-</b></span>
+        <span>Channel: <b id="parsedChannel">-</b></span>
+        <span>Message: <b id="parsedMessage">-</b></span>
+      </div>
+
+      <div class="input-group">
+        <label><i class="fas fa-smile"></i> 絵文字</label>
+        <div class="emoji-input-group">
+          <input type="text" id="emojiInput" placeholder="😀 または :emoji_name:">
+          <button class="emoji-btn" onclick="toggleEmojiPicker()">😀</button>
+        </div>
+        
+        <div class="emoji-presets">
+          <span onclick="setEmoji('😀')">😀</span>
+          <span onclick="setEmoji('❤️')">❤️</span>
+          <span onclick="setEmoji('🔥')">🔥</span>
+          <span onclick="setEmoji('💀')">💀</span>
+          <span onclick="setEmoji('🤡')">🤡</span>
+          <span onclick="setEmoji('🎉')">🎉</span>
+          <span onclick="setEmoji('👍')">👍</span>
+          <span onclick="setEmoji('👎')">👎</span>
+          <span onclick="setEmoji('😂')">😂</span>
+          <span onclick="setEmoji('🤔')">🤔</span>
+          <span onclick="setEmoji('🥵')">🥵</span>
+          <span onclick="setEmoji('💩')">💩</span>
+        </div>
+        
+        <div class="emoji-picker-popup" id="emojiPicker" style="display: none;">
+          <!-- Emoji picker would be populated here -->
+        </div>
+      </div>
+
+      <div class="mode-selection">
+        <label>モード:</label>
+        <div class="mode-buttons">
+          <button class="mode-btn active" data-mode="add" onclick="setMode('add')">
+            <i class="fas fa-plus"></i> 追加
+          </button>
+          <button class="mode-btn" data-mode="remove" onclick="setMode('remove')">
+            <i class="fas fa-minus"></i> 削除
+          </button>
+          <button class="mode-btn" data-mode="toggle" onclick="setMode('toggle')">
+            <i class="fas fa-sync"></i> トグル
+          </button>
+          <button class="mode-btn" data-mode="flood" onclick="setMode('flood')">
+            <i class="fas fa-bomb"></i> フロード
+          </button>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label><i class="fas fa-key"></i> トークン</label>
+        <textarea id="tokenList" placeholder="トークンを1行ずつ入力..."></textarea>
+      </div>
+
+      <div class="config-grid">
+        <div class="input-group">
+          <label><i class="fas fa-redo"></i> 回数</label>
+          <input type="number" id="repeatCount" value="1" min="1">
+        </div>
+        <div class="input-group">
+          <label><i class="fas fa-clock"></i> 遅延 (ms)</label>
+          <input type="number" id="delay" value="500" min="0">
+        </div>
+        <div class="input-group">
+          <label><i class="fas fa-bolt"></i> 並列数</label>
+          <input type="number" id="threads" value="5" min="1" max="20">
+        </div>
+      </div>
+
+      <div class="options-section">
+        <label><input type="checkbox" id="useRandomEmoji"> ランダム絵文字</label>
+        <label><input type="checkbox" id="removeOthers"> 他のリアクションを削除</label>
+        <label><input type="checkbox" id="burstMode"> バーストモード</label>
+      </div>
+
+      <div class="button-group">
+        <button class="btn-primary btn-large" id="startBtn" onclick="startReaction()">
+          <i class="fas fa-play"></i> 開始
+        </button>
+        <button class="btn-danger" id="stopBtn" onclick="stopReaction()" disabled>
+          <i class="fas fa-stop"></i> 停止
+        </button>
+        <button class="btn-secondary" onclick="clearAll()">
+          <i class="fas fa-trash"></i> クリア
+        </button>
+      </div>
+
+      <div class="progress-section">
+        <div class="progress-bar">
+          <div id="progressFill"></div>
+        </div>
+        <div class="progress-stats">
+          <span>成功: <b id="successCount">0</b></span>
+          <span>失敗: <b id="failCount">0</b></span>
+          <span>レート制限: <b id="rateLimitCount">0</b></span>
+        </div>
+      </div>
+
+      <div class="console-output" id="console"></div>
     </div>
   </div>
-  
+
   <script>
+    let currentMode = 'add';
+    let isRunning = false;
+    let shouldStop = false;
+    let channelId = null;
+    let messageId = null;
+
     const API_BASE = 'https://discord.com/api/v9';
-    let selectedEmoji = '👍';
-    
-    document.querySelectorAll('.emoji-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        selectedEmoji = btn.dataset.emoji;
-        document.getElementById('selectedEmoji').value = selectedEmoji;
-      });
-    });
-    
-    const log = (msg, type = 'prompt') => {
+
+    function log(message, type = 'info') {
       const console = document.getElementById('console');
-      const line = document.createElement('div');
-      line.className = 'console-line';
-      line.innerHTML = `<span class="${type}">$</span> ${msg}`;
-      console.appendChild(line);
+      const time = new Date().toLocaleTimeString();
+      const div = document.createElement('div');
+      div.className = `log-entry log-${type}`;
+      div.innerHTML = `<span class="log-time">[${time}]</span> ${message}`;
+      console.appendChild(div);
       console.scrollTop = console.scrollHeight;
-    };
-    
-    async function addReaction(channelId, messageId, emoji, token) {
-      const emojiEncoded = encodeURIComponent(emoji);
-      const response = await fetch(
-        `${API_BASE}/channels/${channelId}/messages/${messageId}/reactions/${emojiEncoded}/@me`,
-        {
-          method: 'PUT',
-          headers: {
-            'Authorization': token,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-      return response;
     }
-    
-    document.getElementById('reactionForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
+
+    function parseMessageUrl() {
+      const url = document.getElementById('messageUrl').value.trim();
+      const match = url.match(/channels\/(\d+)\/(\d+)\/(\d+)/);
       
-      const token = document.getElementById('token').value;
-      const channelId = document.getElementById('channelId').value;
-      const messageId = document.getElementById('messageId').value;
-      const emoji = document.getElementById('selectedEmoji').value;
-      
-      const btn = document.getElementById('startBtn');
-      btn.disabled = true;
-      btn.textContent = '> SPAMMING...';
-      
-      log(`Starting reaction spam with ${emoji}...`, 'success');
-      
-      let count = 0;
-      const max = 20;
-      
-      const interval = setInterval(async () => {
-        if (count >= max) {
-          clearInterval(interval);
-          log('Reaction spam complete', 'success');
-          btn.disabled = false;
-          btn.textContent = '> EXECUTE_REACTION_SPAM';
-          return;
-        }
+      if (match) {
+        const [, guildId, chanId, msgId] = match;
+        channelId = chanId;
+        messageId = msgId;
         
-        try {
-          const res = await addReaction(channelId, messageId, emoji, token);
-          if (res.ok) {
-            count++;
-            log(`Reaction ${count}/${max} added`, 'prompt');
-          } else if (res.status === 429) {
-            log('Rate limited, waiting...', 'error');
-          } else {
-            log(`Error: ${res.status}`, 'error');
+        document.getElementById('parsedInfo').style.display = 'flex';
+        document.getElementById('parsedGuild').textContent = guildId;
+        document.getElementById('parsedChannel').textContent = chanId;
+        document.getElementById('parsedMessage').textContent = msgId;
+        
+        log('メッセージURLを解析しました', 'success');
+      } else {
+        log('無効なメッセージURLです', 'error');
+      }
+    }
+
+    function setEmoji(emoji) {
+      document.getElementById('emojiInput').value = emoji;
+    }
+
+    function toggleEmojiPicker() {
+      const picker = document.getElementById('emojiPicker');
+      picker.style.display = picker.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+    }
+
+    async function startReaction() {
+      if (!channelId || !messageId) {
+        parseMessageUrl();
+        if (!channelId || !messageId) return;
+      }
+
+      const tokens = document.getElementById('tokenList').value.trim().split('\n').filter(t => t);
+      const emoji = document.getElementById('emojiInput').value.trim();
+      const repeatCount = parseInt(document.getElementById('repeatCount').value) || 1;
+      const delay = parseInt(document.getElementById('delay').value) || 500;
+      const threads = parseInt(document.getElementById('threads').value) || 5;
+      const useRandom = document.getElementById('useRandomEmoji').checked;
+      const burstMode = document.getElementById('burstMode').checked;
+
+      if (!tokens.length) {
+        log('トークンを入力してください', 'error');
+        return;
+      }
+
+      isRunning = true;
+      shouldStop = false;
+      document.getElementById('startBtn').disabled = true;
+      document.getElementById('stopBtn').disabled = false;
+
+      const emojis = ['😀', '❤️', '🔥', '💀', '🤡', '🎉', '👍', '👎', '😂', '🤔', '🥵', '💩', 
+                      '😍', '🤮', '💯', '✨', '🌟', '⚡', '💣', '🔪'];
+      
+      let success = 0, failed = 0, rateLimited = 0;
+      const total = tokens.length * repeatCount;
+
+      log(`リアクション${currentMode}開始: ${tokens.length}トークン`, 'info');
+
+      const worker = async (tokenBatch) => {
+        for (const tokenStr of tokenBatch) {
+          if (shouldStop) break;
+          
+          const token = tokenStr.split(':').pop().trim();
+          let targetEmoji = useRandom ? emojis[Math.floor(Math.random() * emojis.length)] : emoji;
+          
+          // Convert emoji to API format
+          if (targetEmoji.includes(':')) {
+            targetEmoji = targetEmoji.replace(/:/g, '');
           }
-        } catch (err) {
-          log(`Failed: ${err.message}`, 'error');
+
+          for (let i = 0; i < repeatCount; i++) {
+            if (shouldStop) break;
+
+            try {
+              let response;
+              const encodedEmoji = encodeURIComponent(targetEmoji);
+
+              if (currentMode === 'add' || currentMode === 'flood') {
+                response = await fetch(`${API_BASE}/channels/${channelId}/messages/${messageId}/reactions/${encodedEmoji}/@me`, {
+                  method: 'PUT',
+                  headers: { 'Authorization': token }
+                });
+              } else if (currentMode === 'remove') {
+                response = await fetch(`${API_BASE}/channels/${channelId}/messages/${messageId}/reactions/${encodedEmoji}/@me`, {
+                  method: 'DELETE',
+                  headers: { 'Authorization': token }
+                });
+              } else if (currentMode === 'toggle') {
+                // Try to add, if fails (already exists), remove
+                response = await fetch(`${API_BASE}/channels/${channelId}/messages/${messageId}/reactions/${encodedEmoji}/@me`, {
+                  method: 'PUT',
+                  headers: { 'Authorization': token }
+                });
+                if (response.status === 400) {
+                  response = await fetch(`${API_BASE}/channels/${channelId}/messages/${messageId}/reactions/${encodedEmoji}/@me`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': token }
+                  });
+                }
+              }
+
+              if (response.ok) {
+                success++;
+                log(`リアクション成功: ${targetEmoji}`, 'success');
+              } else if (response.status === 429) {
+                rateLimited++;
+                failed++;
+                log(`レート制限: ${targetEmoji}`, 'warning');
+                await new Promise(r => setTimeout(r, 5000));
+              } else {
+                failed++;
+                log(`失敗: ${response.status}`, 'error');
+              }
+            } catch (e) {
+              failed++;
+              log(`エラー: ${e.message}`, 'error');
+            }
+
+            // Update progress
+            const progress = ((success + failed) / total) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+            document.getElementById('successCount').textContent = success;
+            document.getElementById('failCount').textContent = failed;
+            document.getElementById('rateLimitCount').textContent = rateLimited;
+
+            await new Promise(r => setTimeout(r, burstMode ? 50 : delay));
+          }
         }
-      }, 500);
-    });
+      };
+
+      // Split tokens into batches
+      const batchSize = Math.ceil(tokens.length / threads);
+      const batches = [];
+      for (let i = 0; i < threads; i++) {
+        batches.push(tokens.slice(i * batchSize, (i + 1) * batchSize));
+      }
+
+      await Promise.all(batches.map(worker));
+
+      isRunning = false;
+      document.getElementById('startBtn').disabled = false;
+      document.getElementById('stopBtn').disabled = true;
+      log('リアクション操作完了', 'success');
+    }
+
+    function stopReaction() {
+      shouldStop = true;
+      isRunning = false;
+      log('停止中...', 'warning');
+    }
+
+    function clearAll() {
+      document.getElementById('tokenList').value = '';
+      document.getElementById('messageUrl').value = '';
+      document.getElementById('emojiInput').value = '';
+      document.getElementById('parsedInfo').style.display = 'none';
+      document.getElementById('progressFill').style.width = '0%';
+      document.getElementById('successCount').textContent = '0';
+      document.getElementById('failCount').textContent = '0';
+      document.getElementById('rateLimitCount').textContent = '0';
+      log('クリアしました', 'info');
+    }
   </script>
 </body>
 </html>
