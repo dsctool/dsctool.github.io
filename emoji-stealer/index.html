@@ -251,7 +251,6 @@
         const token = tokens[i % tokens.length].split(':').pop().trim();
 
         try {
-          // Download emoji
           const emojiUrl = `${CDN_BASE}/emojis/${emoji.id}.${emoji.animated ? 'gif' : 'png'}`;
           const imgResponse = await fetch(emojiUrl);
           
@@ -267,7 +266,6 @@
             reader.readAsDataURL(blob);
           });
 
-          // Upload to target
           const name = (addPrefix ? prefix : '') + (keepNames ? emoji.name : `emoji_${i}`);
           const response = await fetch(`${API_BASE}/guilds/${targetGuild}/emojis`, {
             method: 'POST',
@@ -311,7 +309,6 @@
           log(`エラー: ${e.message}`, 'error');
         }
 
-        // Update progress
         document.getElementById('progressText').textContent = `${i + 1}/${selected.length}`;
         document.getElementById('successCount').textContent = success;
         document.getElementById('failCount').textContent = failed;
