@@ -3,317 +3,435 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ShadowTools - Discord Arsenal</title>
+  <title>ShadowTools v2.0 - Discord Arsenal</title>
   <link rel="stylesheet" href="styles.css">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+  <!-- Background Effects -->
   <div class="bg-grid"></div>
-  <div class="scanlines"></div>
-  
-  <div class="container">
-    <header>
-      <h1 class="glitch" data-text="SHADOWTOOLS">SHADOWTOOLS</h1>
-      <p class="subtitle">Discord Arsenal v2.0</p>
-    </header>
+  <div class="particles"></div>
+  <div class="noise"></div>
 
-    <nav class="tool-nav">
-      <button class="nav-btn active" data-tool="spammer">📨 Mass DM</button>
-      <button class="nav-btn" data-tool="raider">⚔️ Raider</button>
-      <button class="nav-btn" data-tool="webhook">🔗 Webhook</button>
-      <button class="nav-btn" data-tool="checker">🔍 Token Check</button>
-      <button class="nav-btn" data-tool="reaction">👍 Reaction</button>
-      <button class="nav-btn" data-tool="nuker">💣 Nuker</button>
-      <button class="nav-btn" data-tool="friend">👥 Friend Req</button>
-      <button class="nav-btn" data-tool="nickname">🏷️ Nickname</button>
-      <button class="nav-btn" data-tool="roles">🎭 Mass Roles</button>
+  <!-- Header -->
+  <header class="main-header">
+    <div class="logo-container">
+      <div class="logo-icon pulse">
+        <i class="fas fa-skull"></i>
+      </div>
+      <div class="logo-text">
+        <h1>SHADOW<span class="accent">TOOLS</span></h1>
+        <span class="version">v2.0 PREMIUM</span>
+      </div>
+    </div>
+    
+    <nav class="header-nav">
+      <a href="#dashboard" class="nav-link active"><i class="fas fa-home"></i> ホーム</a>
+      <a href="#tools" class="nav-link"><i class="fas fa-toolbox"></i> ツール</a>
+      <a href="#settings" class="nav-link"><i class="fas fa-cog"></i> 設定</a>
     </nav>
 
-    <!-- Mass DM Spammer -->
-    <div class="tool-panel active" id="spammer-panel">
-      <h2>Mass DM Spammer</h2>
-      <div class="input-group">
-        <label>Tokens (1行につき1つ)</label>
-        <textarea id="dmTokens" placeholder="MTE5xxxxxxxxxxxxxxxx&#10;MTE5xxxxxxxxxxxxxxxx" rows="4"></textarea>
+    <div class="header-stats">
+      <div class="stat-item" title="アクティブトークン">
+        <i class="fas fa-key"></i>
+        <span id="activeTokens">0</span>
       </div>
-      <div class="input-group">
-        <label>Target User IDs</label>
-        <textarea id="dmTargets" placeholder="1234567890123456789&#10;9876543210987654321" rows="3"></textarea>
+      <div class="stat-item" title="送信リクエスト">
+        <i class="fas fa-paper-plane"></i>
+        <span id="requestsSent">0</span>
       </div>
-      <div class="input-group">
-        <label>Message</label>
-        <textarea id="dmMessage" placeholder="Your message here..." rows="3"></textarea>
+      <div class="stat-item" title="稼働時間">
+        <i class="fas fa-clock"></i>
+        <span id="uptime">00:00:00</span>
       </div>
-      <div class="input-row">
-        <div class="input-group half">
-          <label>Count</label>
-          <input type="number" id="dmCount" value="10" min="1">
-        </div>
-        <div class="input-group half">
-          <label>Delay (ms)</label>
-          <input type="number" id="dmDelay" value="1000" min="0">
-        </div>
-      </div>
-      <div class="btn-group">
-        <button id="startDmBtn" class="btn-primary">🚀 開始</button>
-        <button id="stopDmBtn" class="btn-danger">🛑 停止</button>
-      </div>
-      <div class="log-box" id="dmLog"></div>
     </div>
+  </header>
 
-    <!-- Raider -->
-    <div class="tool-panel" id="raider-panel">
-      <h2>Server Raider</h2>
-      <div class="input-group">
-        <label>Tokens</label>
-        <textarea id="raidTokens" placeholder="Tokens here..." rows="4"></textarea>
+  <!-- Main Container -->
+  <main class="main-container">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <h3><i class="fas fa-star"></i> クイックアクセス</h3>
+        <ul class="tool-list">
+          <li><a href="token-onliner/"><i class="fas fa-circle"></i> Token Onliner</a></li>
+          <li><a href="reaction-spammer/"><i class="fas fa-heart"></i> Reaction Spammer</a></li>
+          <li><a href="nick-changer/"><i class="fas fa-user-tag"></i> Nickname Changer</a></li>
+          <li><a href="friend-spammer/"><i class="fas fa-user-plus"></i> Friend Spammer</a></li>
+          <li><a href="thread-spammer/"><i class="fas fa-comments"></i> Thread Spammer</a></li>
+          <li><a href="emoji-stealer/"><i class="fas fa-smile"></i> Emoji Stealer</a></li>
+          <li><a href="voice-joiner/"><i class="fas fa-microphone"></i> Voice Joiner</a></li>
+          <li><a href="server-cloner/"><i class="fas fa-clone"></i> Server Cloner</a></li>
+        </ul>
       </div>
-      <div class="input-group">
-        <label>Guild ID</label>
-        <input type="text" id="raidGuild" placeholder="1234567890123456789">
+
+      <div class="sidebar-section">
+        <h3><i class="fas fa-history"></i> 最近使用</h3>
+        <ul class="recent-list" id="recentTools">
+          <li class="empty">履歴がありません</li>
+        </ul>
       </div>
-      <div class="input-group">
-        <label>Channel ID</label>
-        <input type="text" id="raidChannel" placeholder="9876543210987654321">
-      </div>
-      <div class="input-group">
-        <label>Message Content</label>
-        <textarea id="raidMessage" placeholder="@everyone RAID!" rows="2"></textarea>
-      </div>
-      <div class="options-grid">
-        <label class="checkbox"><input type="checkbox" id="raidMention"> @everyone</label>
-        <label class="checkbox"><input type="checkbox" id="raidPing"> Mass Ping</label>
-        <label class="checkbox"><input type="checkbox" id="raidTts"> TTS</label>
-      </div>
-      <div class="input-row">
-        <div class="input-group half">
-          <label>Threads</label>
-          <input type="number" id="raidThreads" value="5" min="1" max="20">
+
+      <div class="sidebar-section">
+        <h3><i class="fas fa-info-circle"></i> システム情報</h3>
+        <div class="system-info">
+          <div class="info-row">
+            <span>バージョン</span>
+            <span>v2.0.0</span>
+          </div>
+          <div class="info-row">
+            <span>API</span>
+            <span class="status online">v9</span>
+          </div>
+          <div class="info-row">
+            <span>WebSocket</span>
+            <span class="status offline">Disconnected</span>
+          </div>
         </div>
-        <div class="input-group half">
-          <label>Delay</label>
-          <input type="number" id="raidDelay" value="500" min="0">
+      </div>
+    </aside>
+
+    <!-- Content Area -->
+    <div class="content-area">
+      
+      <!-- Dashboard Section -->
+      <section id="dashboard" class="content-section active">
+        <div class="welcome-banner">
+          <div class="banner-content">
+            <h2><i class="fas fa-terminal"></i> ShadowTools v2.0</h2>
+            <p>高度なDiscord自動化ツールキットへようこそ</p>
+            <div class="banner-stats">
+              <div class="banner-stat">
+                <i class="fas fa-rocket"></i>
+                <span>高速実行</span>
+              </div>
+              <div class="banner-stat">
+                <i class="fas fa-shield-alt"></i>
+                <span>安全設計</span>
+              </div>
+              <div class="banner-stat">
+                <i class="fas fa-code"></i>
+                <span>オープンソース</span>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="btn-group">
-        <button id="startRaidBtn" class="btn-primary">⚔️ RAID開始</button>
-        <button id="stopRaidBtn" class="btn-danger">🛑 停止</button>
-        <button id="leaveGuildBtn" class="btn-secondary">🚪 脱退</button>
-      </div>
-      <div class="log-box" id="raidLog"></div>
+
+        <!-- Global Token Manager -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3><i class="fas fa-key"></i> グローバルトークンマネージャー</h3>
+            <div class="panel-actions">
+              <button class="btn-icon" onclick="importTokens()" title="インポート"><i class="fas fa-file-import"></i></button>
+              <button class="btn-icon" onclick="exportTokens()" title="エクスポート"><i class="fas fa-file-export"></i></button>
+              <button class="btn-icon danger" onclick="clearTokens()" title="クリア"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <textarea id="globalTokens" class="token-input" placeholder="トークンを1行ずつ貼り付け...&#10;フォーマット: token&#10;または: email:password:token"></textarea>
+            <div class="token-actions">
+              <button class="btn-primary" onclick="validateTokens()">
+                <i class="fas fa-check-circle"></i> 検証
+              </button>
+              <button class="btn-secondary" onclick="checkAllTokens()">
+                <i class="fas fa-search"></i> 詳細チェック
+              </button>
+              <span class="token-count" id="tokenCount">0 tokens</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tools Grid -->
+        <div class="tools-section" id="tools">
+          <h3 class="section-title"><i class="fas fa-th-large"></i> ツール一覧</h3>
+          
+          <div class="tools-grid">
+            <!-- Token Onliner -->
+            <a href="token-onliner/" class="tool-card">
+              <div class="tool-icon" style="background: linear-gradient(135deg, #00d4ff, #0099cc);">
+                <i class="fas fa-circle"></i>
+              </div>
+              <div class="tool-info">
+                <h4>Token Onliner</h4>
+                <p>トークンをオンライン状態に</p>
+                <div class="tool-tags">
+                  <span class="tag">WebSocket</span>
+                  <span class="tag">Presence</span>
+                </div>
+              </div>
+              <div class="tool-arrow"><i class="fas fa-chevron-right"></i></div>
+            </a>
+
+            <!-- Reaction Spammer -->
+            <a href="reaction-spammer/" class="tool-card">
+              <div class="tool-icon" style="background: linear-gradient(135deg, #ff006e, #ff4d9e);">
+                <i class="fas fa-heart"></i>
+              </div>
+              <div class="tool-info">
+                <h4>Reaction Spammer</h4>
+                <p>自動リアクション追加・削除</p>
+                <div class="tool-tags">
+                  <span class="tag">Emoji</span>
+                  <span class="tag">Auto</span>
+                </div>
+              </div>
+              <div class="tool-arrow"><i class="fas fa-chevron-right"></i></div>
+            </a>
+
+            <!-- Nickname Changer -->
+            <a href="nick-changer/" class="tool-card">
+              <div class="tool-icon" style="background: linear-gradient(135deg, #8338ec, #a855f7);">
+                <i class="fas fa-user-tag"></i>
+              </div>
+              <div class="tool-info">
+                <h4>Nickname Changer</h4>
+                <p>一括ニックネーム変更</p>
+                <div class="tool-tags">
+                  <span class="tag">Mass</span>
+                  <span class="tag">ASCII</span>
+                </div>
+              </div>
+              <div class="tool-arrow"><i class="fas fa-chevron-right"></i></div>
+            </a>
+
+            <!-- Friend Spammer -->
+            <a href="friend-spammer/" class="tool-card">
+              <div class="tool-icon" style="background: linear-gradient(135deg, #3a86ff, #60a5fa);">
+                <i class="fas fa-user-plus"></i>
+              </div>
+              <div class="tool-info">
+                <h4>Friend Spammer</h4>
+                <p>フレンド申請自動送信</p>
+                <div class="tool-tags">
+                  <span class="tag">Social</span>
+                  <span class="tag">DM</span>
+                </div>
+              </div>
+              <div class="tool-arrow"><i class="fas fa-chevron-right"></i></div>
+            </a>
+
+            <!-- Thread Spammer -->
+            <a href="thread-spammer/" class="tool-card">
+              <div class="tool-icon" style="background: linear-gradient(135deg, #06ffa5, #34d399);">
+                <i class="fas fa-comments"></i>
+              </div>
+              <div class="tool-info">
+                <h4>Thread Spammer</h4>
+                <p>スレッド自動作成</p>
+                <div class="tool-tags">
+                  <span class="tag">Thread</span>
+                  <span class="tag">Forum</span>
+                </div>
+              </div>
+              <div class="tool-arrow"><i class="fas fa-chevron-right"></i></div>
+            </a>
+
+            <!-- Emoji Stealer -->
+            <a href="emoji-stealer/" class="tool-card">
+              <div class="tool-icon" style="background: linear-gradient(135deg, #fbbf24, #f59e0b);">
+                <i class="fas fa-smile"></i>
+              </div>
+              <div class="tool-info">
+                <h4>Emoji Stealer</h4>
+                <p>絵文字盗用・コピー</p>
+                <div class="tool-tags">
+                  <span class="tag">Steal</span>
+                  <span class="tag">Upload</span>
+                </div>
+              </div>
+              <div class="tool-arrow"><i class="fas fa-chevron-right"></i></div>
+            </a>
+
+            <!-- Voice Joiner -->
+            <a href="voice-joiner/" class="tool-card">
+              <div class="tool-icon" style="background: linear-gradient(135deg, #ef4444, #f87171);">
+                <i class="fas fa-microphone"></i>
+              </div>
+              <div class="tool-info">
+                <h4>Voice Joiner</h4>
+                <p>ボイスチャンネル参加</p>
+                <div class="tool-tags">
+                  <span class="tag">Voice</span>
+                  <span class="tag">RTC</span>
+                </div>
+              </div>
+              <div class="tool-arrow"><i class="fas fa-chevron-right"></i></div>
+            </a>
+
+            <!-- Server Cloner -->
+            <a href="server-cloner/" class="tool-card">
+              <div class="tool-icon" style="background: linear-gradient(135deg, #8b5cf6, #a78bfa);">
+                <i class="fas fa-clone"></i>
+              </div>
+              <div class="tool-info">
+                <h4>Server Cloner</h4>
+                <p>サーバー構造複製</p>
+                <div class="tool-tags">
+                  <span class="tag">Clone</span>
+                  <span class="tag">Backup</span>
+                </div>
+              </div>
+              <div class="tool-arrow"><i class="fas fa-chevron-right"></i></div>
+            </a>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions-panel">
+          <h3><i class="fas fa-bolt"></i> クイックアクション</h3>
+          <div class="action-buttons">
+            <button class="action-btn" onclick="loadAllTokens()">
+              <i class="fas fa-upload"></i>
+              <span>トークン読込</span>
+            </button>
+            <button class="action-btn" onclick="exportLogs()">
+              <i class="fas fa-download"></i>
+              <span>ログ出力</span>
+            </button>
+            <button class="action-btn" onclick="checkProxies()">
+              <i class="fas fa-network-wired"></i>
+              <span>プロキシチェック</span>
+            </button>
+            <button class="action-btn danger" onclick="emergencyStop()">
+              <i class="fas fa-stop-circle"></i>
+              <span>緊急停止</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Settings Section -->
+      <section id="settings" class="content-section">
+        <div class="settings-container">
+          <h2><i class="fas fa-cog"></i> 設定</h2>
+          
+          <div class="settings-grid">
+            <div class="setting-card">
+              <h3><i class="fas fa-sliders-h"></i> 一般設定</h3>
+              <div class="setting-item">
+                <label>デフォルト遅延 (ms)</label>
+                <input type="number" id="defaultDelay" value="1000">
+              </div>
+              <div class="setting-item">
+                <label>並列スレッド数</label>
+                <input type="number" id="defaultThreads" value="5">
+              </div>
+              <div class="setting-item">
+                <label>ログ保持期間 (日)</label>
+                <input type="number" id="logRetention" value="7">
+              </div>
+            </div>
+
+            <div class="setting-card">
+              <h3><i class="fas fa-shield-alt"></i> セキュリティ</h3>
+              <div class="setting-item">
+                <label><input type="checkbox" id="maskTokens" checked> トークンを隠す</label>
+              </div>
+              <div class="setting-item">
+                <label><input type="checkbox" id="autoClear" checked> 自動クリア</label>
+              </div>
+              <div class="setting-item">
+                <label><input type="checkbox" id="confirmActions"> アクション確認</label>
+              </div>
+            </div>
+
+            <div class="setting-card">
+              <h3><i class="fas fa-palette"></i> 外観</h3>
+              <div class="setting-item">
+                <label>テーマ</label>
+                <select id="theme">
+                  <option value="dark">ダーク</option>
+                  <option value="darker">より暗い</option>
+                  <option value="cyber">サイバー</option>
+                </select>
+              </div>
+              <div class="setting-item">
+                <label>アニメーション</label>
+                <select id="animations">
+                  <option value="full">フル</option>
+                  <option value="reduced">軽減</option>
+                  <option value="none">なし</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="setting-card">
+              <h3><i class="fas fa-network-wired"></i> ネットワーク</h3>
+              <div class="setting-item">
+                <label>APIバージョン</label>
+                <select id="apiVersion">
+                  <option value="9" selected>v9</option>
+                  <option value="10">v10</option>
+                </select>
+              </div>
+              <div class="setting-item">
+                <label>プロキシ</label>
+                <textarea id="proxyList" placeholder="http://proxy:port&#10;複数入力可"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-actions">
+            <button class="btn-primary" onclick="saveSettings()">
+              <i class="fas fa-save"></i> 保存
+            </button>
+            <button class="btn-secondary" onclick="resetSettings()">
+              <i class="fas fa-undo"></i> リセット
+            </button>
+            <button class="btn-secondary" onclick="exportSettings()">
+              <i class="fas fa-file-export"></i> エクスポート
+            </button>
+          </div>
+        </div>
+      </section>
+
     </div>
+  </main>
 
-    <!-- Webhook Spammer -->
-    <div class="tool-panel" id="webhook-panel">
-      <h2>Webhook Spammer</h2>
-      <div class="input-group">
-        <label>Webhook URLs (1行につき1つ)</label>
-        <textarea id="webhookUrls" placeholder="https://discord.com/api/webhooks/...&#10;https://discord.com/api/webhooks/..." rows="4"></textarea>
+  <!-- Floating Console -->
+  <div class="floating-console" id="floatingConsole">
+    <div class="console-header">
+      <span><i class="fas fa-terminal"></i> システムログ</span>
+      <div class="console-controls">
+        <button onclick="minimizeConsole()" title="最小化"><i class="fas fa-minus"></i></button>
+        <button onclick="maximizeConsole()" title="最大化"><i class="fas fa-expand"></i></button>
+        <button onclick="clearConsole()" title="クリア"><i class="fas fa-eraser"></i></button>
+        <button onclick="closeConsole()" title="閉じる"><i class="fas fa-times"></i></button>
       </div>
-      <div class="input-group">
-        <label>Message / Embed JSON</label>
-        <textarea id="webhookMessage" placeholder="Message or embed JSON..." rows="4"></textarea>
-      </div>
-      <div class="input-group">
-        <label>Username Override</label>
-        <input type="text" id="webhookName" placeholder="Webhook Name">
-      </div>
-      <div class="input-group">
-        <label>Avatar URL</label>
-        <input type="text" id="webhookAvatar" placeholder="https://...">
-      </div>
-      <div class="options-grid">
-        <label class="checkbox"><input type="checkbox" id="webhookEmbed"> Use Embed</label>
-        <label class="checkbox"><input type="checkbox" id="webhookDelete"> Auto Delete</label>
-      </div>
-      <div class="input-row">
-        <div class="input-group half">
-          <label>Count</label>
-          <input type="number" id="webhookCount" value="50" min="1">
-        </div>
-        <div class="input-group half">
-          <label>Delay (ms)</label>
-          <input type="number" id="webhookDelay" value="100" min="0">
-        </div>
-      </div>
-      <div class="btn-group">
-        <button id="startWebhookBtn" class="btn-primary">🔗 開始</button>
-        <button id="stopWebhookBtn" class="btn-danger">🛑 停止</button>
-        <button id="deleteWebhookBtn" class="btn-warning">🗑️ 削除</button>
-      </div>
-      <div class="log-box" id="webhookLog"></div>
     </div>
-
-    <!-- Token Checker -->
-    <div class="tool-panel" id="checker-panel">
-      <h2>Token Checker</h2>
-      <div class="input-group">
-        <label>Tokens (1行につき1つ)</label>
-        <textarea id="checkTokens" placeholder="Paste tokens here..." rows="6"></textarea>
+    <div class="console-body" id="systemLog">
+      <div class="log-entry log-info">
+        <span class="log-time">[--:--:--]</span> ShadowTools v2.0 initialized
       </div>
-      <div class="btn-group">
-        <button id="checkTokenBtn" class="btn-primary">🔍 検証開始</button>
-        <button id="exportValidBtn" class="btn-secondary">💾 有効トークン保存</button>
-      </div>
-      <div class="stats-box" id="checkStats">
-        <span>Valid: <b id="validCount">0</b></span>
-        <span>Invalid: <b id="invalidCount">0</b></span>
-        <span>Locked: <b id="lockedCount">0</b></span>
-      </div>
-      <div class="log-box" id="checkLog"></div>
     </div>
-
-    <!-- Reaction Spammer -->
-    <div class="tool-panel" id="reaction-panel">
-      <h2>Reaction Spammer</h2>
-      <div class="input-group">
-        <label>Tokens</label>
-        <textarea id="reactTokens" placeholder="Tokens..." rows="4"></textarea>
-      </div>
-      <div class="input-row">
-        <div class="input-group half">
-          <label>Channel ID</label>
-          <input type="text" id="reactChannel" placeholder="Channel ID">
-        </div>
-        <div class="input-group half">
-          <label>Message ID</label>
-          <input type="text" id="reactMessage" placeholder="Message ID">
-        </div>
-      </div>
-      <div class="input-group">
-        <label>Emojis (1行につき1つ)</label>
-        <textarea id="reactEmojis" placeholder="😀&#10;🔥&#10;custom:emoji_id" rows="3"></textarea>
-      </div>
-      <div class="btn-group">
-        <button id="startReactBtn" class="btn-primary">👍 リアクション開始</button>
-        <button id="stopReactBtn" class="btn-danger">🛑 停止</button>
-      </div>
-      <div class="log-box" id="reactLog"></div>
+    <div class="console-input">
+      <input type="text" id="consoleCommand" placeholder="コマンドを入力..." onkeypress="handleCommand(event)">
+      <button onclick="executeCommand()"><i class="fas fa-chevron-right"></i></button>
     </div>
-
-    <!-- Server Nuker -->
-    <div class="tool-panel" id="nuker-panel">
-      <h2>Server Nuker</h2>
-      <div class="input-group">
-        <label>Bot Token (Admin権限必須)</label>
-        <input type="text" id="nukeToken" placeholder="Bot Token">
-      </div>
-      <div class="input-group">
-        <label>Guild ID</label>
-        <input type="text" id="nukeGuild" placeholder="Guild ID">
-      </div>
-      <div class="nuke-options">
-        <h3>破壊オプション</h3>
-        <label class="checkbox"><input type="checkbox" id="nukeChannels"> 全チャンネル削除</label>
-        <label class="checkbox"><input type="checkbox" id="nukeRoles"> 全ロール削除</label>
-        <label class="checkbox"><input type="checkbox" id="nukeEmojis"> 全絵文字削除</label>
-        <label class="checkbox"><input type="checkbox" id="nukeInvites"> 全招待無効化</label>
-        <label class="checkbox"><input type="checkbox" id="nukeBan"> 全メンバーをBAN</label>
-        <label class="checkbox"><input type="checkbox" id="nukeKick"> 全メンバーをKICK</label>
-      </div>
-      <div class="input-group">
-        <label>新しいサーバー名</label>
-        <input type="text" id="nukeName" placeholder="Nuked by ShadowTools">
-      </div>
-      <div class="btn-group">
-        <button id="startNukeBtn" class="btn-danger">💣 NUKE実行</button>
-      </div>
-      <div class="log-box" id="nukeLog"></div>
-    </div>
-
-    <!-- Friend Request Spammer -->
-    <div class="tool-panel" id="friend-panel">
-      <h2>Friend Request Spammer</h2>
-      <div class="input-group">
-        <label>Tokens</label>
-        <textarea id="friendTokens" placeholder="Tokens..." rows="4"></textarea>
-      </div>
-      <div class="input-group">
-        <label>Target Usernames (name#tag)</label>
-        <textarea id="friendTargets" placeholder="user#1234&#10;test#5678" rows="4"></textarea>
-      </div>
-      <div class="input-row">
-        <div class="input-group half">
-          <label>Delay (ms)</label>
-          <input type="number" id="friendDelay" value="2000" min="500">
-        </div>
-      </div>
-      <div class="btn-group">
-        <button id="startFriendBtn" class="btn-primary">👥 フレンド申請開始</button>
-        <button id="stopFriendBtn" class="btn-danger">🛑 停止</button>
-      </div>
-      <div class="log-box" id="friendLog"></div>
-    </div>
-
-    <!-- Nickname Changer -->
-    <div class="tool-panel" id="nickname-panel">
-      <h2>Nickname Changer</h2>
-      <div class="input-group">
-        <label>Bot Token</label>
-        <input type="text" id="nickToken" placeholder="Bot Token">
-      </div>
-      <div class="input-group">
-        <label>Guild ID</label>
-        <input type="text" id="nickGuild" placeholder="Guild ID">
-      </div>
-      <div class="input-group">
-        <label>New Nickname</label>
-        <input type="text" id="nickName" placeholder="New Nickname">
-      </div>
-      <div class="options-grid">
-        <label class="checkbox"><input type="checkbox" id="nickRandom"> ランダム文字列追加</label>
-        <label class="checkbox"><input type="checkbox" id="nickMe"> 自分のみ変更</label>
-      </div>
-      <div class="btn-group">
-        <button id="startNickBtn" class="btn-primary">🏷️ 変更実行</button>
-      </div>
-      <div class="log-box" id="nickLog"></div>
-    </div>
-
-    <!-- Mass Role Creator -->
-    <div class="tool-panel" id="roles-panel">
-      <h2>Mass Role Creator</h2>
-      <div class="input-group">
-        <label>Bot Token</label>
-        <input type="text" id="roleToken" placeholder="Bot Token">
-      </div>
-      <div class="input-group">
-        <label>Guild ID</label>
-        <input type="text" id="roleGuild" placeholder="Guild ID">
-      </div>
-      <div class="input-group">
-        <label>Role Names (1行につき1つ)</label>
-        <textarea id="roleNames" placeholder="Role1&#10;Role2&#10;Role3" rows="5"></textarea>
-      </div>
-      <div class="input-group">
-        <label>Role Color (Hex)</label>
-        <input type="text" id="roleColor" placeholder="#FF0000" value="#FF0000">
-      </div>
-      <div class="options-grid">
-        <label class="checkbox"><input type="checkbox" id="roleHoist"> 別途表示</label>
-        <label class="checkbox"><input type="checkbox" id="roleMention"> メンション許可</label>
-      </div>
-      <div class="input-row">
-        <div class="input-group half">
-          <label>Count per Name</label>
-          <input type="number" id="roleCount" value="10" min="1">
-        </div>
-        <div class="input-group half">
-          <label>Delay (ms)</label>
-          <input type="number" id="roleDelay" value="500" min="0">
-        </div>
-      </div>
-      <div class="btn-group">
-        <button id="startRoleBtn" class="btn-primary">🎭 ロール作成開始</button>
-        <button id="stopRoleBtn" class="btn-danger">🛑 停止</button>
-      </div>
-      <div class="log-box" id="roleLog"></div>
-    </div>
-
-    <footer>
-      <p>ShadowTools v2.0 | Use at your own risk</p>
-    </footer>
   </div>
+
+  <!-- Console Toggle Button -->
+  <button class="console-toggle" onclick="toggleConsole()" title="コンソール">
+    <i class="fas fa-terminal"></i>
+  </button>
+
+  <!-- Footer -->
+  <footer class="main-footer">
+    <div class="footer-content">
+      <div class="footer-left">
+        <span>ShadowTools v2.0</span>
+        <span class="divider">|</span>
+        <span>Made with <i class="fas fa-skull"></i> by Shadow Team</span>
+      </div>
+      <div class="footer-right">
+        <a href="#" onclick="showHelp()"><i class="fas fa-question-circle"></i> ヘルプ</a>
+        <a href="#" onclick="showAbout()"><i class="fas fa-info-circle"></i> About</a>
+        <a href="https://github.com" target="_blank"><i class="fab fa-github"></i> GitHub</a>
+      </div>
+    </div>
+  </footer>
 
   <script src="app.js"></script>
 </body>
