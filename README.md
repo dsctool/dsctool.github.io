@@ -52,7 +52,7 @@ Tokenの有効性をチェックします。
 
 **Webhook Spammer**
 
-Webhookを使用してスパムをします。Webhook再生権限がある場合のみ使用できます。
+Webhookを使用してスパムをします。Webhook生成権限がある場合のみ使用できます。
 
 [使用](raid.takkunlego0916.f5.si/webhook-spammer/)
 
