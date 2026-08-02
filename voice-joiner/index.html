@@ -233,7 +233,6 @@
         const token = tokenStr.split(':').pop().trim();
         
         try {
-          // Connect to gateway
           const ws = new WebSocket(GATEWAY);
           
           ws.onopen = () => {
@@ -244,7 +243,6 @@
             const data = JSON.parse(event.data);
             
             if (data.op === 10) {
-              // Identify
               ws.send(JSON.stringify({
                 op: 2,
                 d: {
@@ -253,7 +251,6 @@
                 }
               }));
 
-              // Voice state update
               setTimeout(() => {
                 ws.send(JSON.stringify({
                   op: 4,
@@ -269,14 +266,12 @@
             }
 
             if (data.op === 4 && data.d && data.d.token) {
-              // Voice server update - connect to voice
               log(`ボイスサーバー接続: ${data.d.endpoint}`, 'success');
             }
           };
 
           wsConnections.set(token, ws);
           
-          // Add to visual list
           addTokenStatus(token, 'connecting');
           
         } catch (e) {
@@ -349,7 +344,6 @@
       statusEl.innerHTML = `<div class="status-item ${status}">${icons[status]}</div>`;
     }
 
-    // Audio type toggle
     document.querySelectorAll('input[name="audioType"]').forEach(radio => {
       radio.addEventListener('change', (e) => {
         document.getElementById('fileInput').style.display = 
