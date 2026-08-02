@@ -1,5 +1,4 @@
 const ShadowApp = {
-  // Configuration
   config: {
     version: '2.0.0',
     apiVersion: 'v9',
@@ -10,7 +9,6 @@ const ShadowApp = {
     maxRetries: 3
   },
 
-  // State
   state: {
     tokens: [],
     logs: [],
@@ -26,7 +24,6 @@ const ShadowApp = {
     settings: {}
   },
 
-  // Utility Functions
   utils: {
     sleep: (ms) => new Promise(resolve => setTimeout(resolve, ms)),
     
@@ -73,14 +70,12 @@ const ShadowApp = {
     }
   },
 
-  // Logging System
   logger: {
     log: (message, type = 'info') => {
       const timestamp = new Date().toLocaleTimeString();
       const entry = { time: timestamp, message, type };
       ShadowApp.state.logs.push(entry);
       
-      // Update system log
       const systemLog = document.getElementById('systemLog');
       if (systemLog) {
         const div = document.createElement('div');
@@ -90,7 +85,6 @@ const ShadowApp = {
         systemLog.scrollTop = systemLog.scrollHeight;
       }
       
-      // Console output
       console.log(`[${type.toUpperCase()}] ${message}`);
     },
 
@@ -100,7 +94,6 @@ const ShadowApp = {
     info: (message) => ShadowApp.logger.log(message, 'info')
   },
 
-  // Token Management
   tokens: {
     load: () => {
       const textarea = document.getElementById('globalTokens');
@@ -112,7 +105,6 @@ const ShadowApp = {
       ShadowApp.state.tokens = lines.map(line => ShadowApp.utils.parseToken(line));
       ShadowApp.tokens.updateCount();
       
-      // Save to localStorage
       localStorage.setItem('shadowtools_tokens', content);
       
       ShadowApp.logger.success(`${ShadowApp.state.tokens.length}個のトークンを読み込みました`);
@@ -144,7 +136,7 @@ const ShadowApp = {
           
           if (response.ok) {
             const user = await response.json();
-            ShadowApp.logger.success(`有効: ${user.username}#${user.discriminator}`);
+            ShadowApp.logger.success(`有効: ${user.username}
             valid++;
           } else {
             ShadowApp.logger.error(`無効: ${tokenData.token.slice(0, 20)}... (${response.status})`);
@@ -201,14 +193,12 @@ const ShadowApp = {
     }
   },
 
-  // Settings Management
   settings: {
     load: () => {
       const saved = localStorage.getItem('shadowtools_settings');
       if (saved) {
         ShadowApp.state.settings = JSON.parse(saved);
         
-        // Apply settings
         document.getElementById('defaultDelay').value = ShadowApp.state.settings.delay || 1000;
         document.getElementById('defaultThreads').value = ShadowApp.state.settings.threads || 5;
         document.getElementById('maskTokens').checked = ShadowApp.state.settings.maskTokens !== false;
@@ -244,10 +234,8 @@ const ShadowApp = {
     }
   },
 
-  // Navigation
   navigation: {
     init: () => {
-      // Smooth scroll for anchor links
       document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
           e.preventDefault();
@@ -258,7 +246,6 @@ const ShadowApp = {
         });
       });
 
-      // Header nav links
       document.querySelectorAll('.header-nav a').forEach(link => {
         link.addEventListener('click', (e) => {
           e.preventDefault();
@@ -283,7 +270,6 @@ const ShadowApp = {
     }
   },
 
-  // Console Management
   console: {
     toggle: () => {
       const console = document.getElementById('floatingConsole');
@@ -315,7 +301,6 @@ const ShadowApp = {
       
       ShadowApp.logger.info(`> ${command}`);
       
-      // Simple command handling
       const parts = command.split(' ');
       const cmd = parts[0].toLowerCase();
       const args = parts.slice(1);
@@ -345,14 +330,11 @@ const ShadowApp = {
     }
   },
 
-  // Stats & Uptime
   stats: {
     update: () => {
-      // Update uptime
       const elapsed = Math.floor((Date.now() - ShadowApp.state.startTime) / 1000);
       document.getElementById('uptime').textContent = ShadowApp.utils.formatTime(elapsed);
       
-      // Update request count
       document.getElementById('requestsSent').textContent = ShadowApp.state.stats.requests;
     },
 
@@ -362,11 +344,9 @@ const ShadowApp = {
     }
   },
 
-  // Initialization
   init: () => {
     ShadowApp.logger.info('ShadowTools v2.0 initialized');
     
-    // Load saved data
     const savedTokens = localStorage.getItem('shadowtools_tokens');
     if (savedTokens) {
       document.getElementById('globalTokens').value = savedTokens;
@@ -376,16 +356,13 @@ const ShadowApp = {
     ShadowApp.settings.load();
     ShadowApp.navigation.init();
     
-    // Start uptime counter
     setInterval(ShadowApp.stats.update, 1000);
     
-    // Token input listener
     const tokenInput = document.getElementById('globalTokens');
     if (tokenInput) {
       tokenInput.addEventListener('input', ShadowApp.utils.debounce(ShadowApp.tokens.load, 500));
     }
     
-    // Console command listener
     const consoleInput = document.getElementById('consoleCommand');
     if (consoleInput) {
       consoleInput.addEventListener('keypress', (e) => {
@@ -395,7 +372,6 @@ const ShadowApp = {
   }
 };
 
-// Global Functions
 function importTokens() { ShadowApp.tokens.import(); }
 function exportTokens() { ShadowApp.tokens.export(); }
 function clearTokens() { ShadowApp.tokens.clear(); }
@@ -447,8 +423,6 @@ function showAbout() {
   alert(`ShadowTools v2.0\n\nA powerful Discord automation toolkit\nVersion: ${ShadowApp.config.version}\nAPI: ${ShadowApp.config.apiVersion}\n\nMade with 💀 by Shadow Team`);
 }
 
-// Initialize on load
 document.addEventListener('DOMContentLoaded', ShadowApp.init);
 
-// Expose to global scope for inline event handlers
 window.ShadowApp = ShadowApp;
