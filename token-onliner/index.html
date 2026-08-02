@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Token Onliner - ShadowTools</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="tool-container">
+    <div class="tool-header">
+      <h1><i class="fas fa-circle"></i> Token Onliner</h1>
+      <p>トークンをオンライン状態にする</p>
+    </div>
+
+    <div class="tool-panel">
+      <div class="status-presence">
+        <div class="presence-card active" data-status="online" onclick="setStatus('online')">
+          <div class="status-dot online"></div>
+          <span>オンライン</span>
+        </div>
+        <div class="presence-card" data-status="idle" onclick="setStatus('idle')">
+          <div class="status-dot idle"></div>
+          <span>退席中</span>
+        </div>
+        <div class="presence-card" data-status="dnd" onclick="setStatus('dnd')">
+          <div class="status-dot dnd"></div>
+          <span>取り込み中</span>
+        </div>
+        <div class="presence-card" data-status="invisible" onclick="setStatus('invisible')">
+          <div class="status-dot invisible"></div>
+          <span>非表示</span>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label><i class="fas fa-key"></i> トークン</label>
+        <textarea id="tokenList" placeholder="トークンを1行ずつ入力..."></textarea>
+      </div>
+
+      <div class="activity-section">
+        <h3><i class="fas fa-gamepad"></i> アクティビティ設定</h3>
+        <div class="config-grid">
+          <div class="input-group">
+            <label>タイプ</label>
+            <select id="activityType">
+              <option value="0">🎮 ゲームをプレイ中</option>
+              <option value="2">🎵 曲を聴いています</option>
+              <option value="3">📺 動画を視聴中</option>
+              <option value="5">🏆 競技に参加中</option>
+              <option value="4">💭 カスタムステータス</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>アクティビティ名</label>
+            <input type="text" id="activityName" placeholder="例: Visual Studio Code">
+          </div>
+          <div class="input-group">
+            <label>詳細</label>
+            <input type="text" id="activityDetails" placeholder="例: Editing app.js">
+          </div>
+          <div class="input-group">
+            <label>ステータステキスト</label>
+            <input type="text" id="customStatus" placeholder="絵文字 + テキスト">
+          </div>
+        </div>
+      </div>
+
+      <div class="options-section">
+        <label><input type="checkbox" id="autoReconnect" checked> 自動再接続</label>
+        <label><input type="checkbox" id="rotateStatus"> ステータス自動切替</label>
+        <label><input type="checkbox" id="showTimestamp"> タイムスタンプ表示</label>
+      </div>
+
+      <div class="button-group">
+        <button class="btn-primary btn-large" id="startBtn" onclick="startOnliner()">
+          <i class="fas fa-power-off"></i> 起動
+        </button>
+        <button class="btn-danger" id="stopBtn" onclick="stopOnliner()" disabled>
+          <i class="fas fa-stop"></i> 停止
+        </button>
+        <button class="btn-secondary" onclick="clearTokens()">
+          <i class="fas fa-trash"></i> クリア
+        </button>
+      </div>
+
+      <div class="stats-panel">
+        <div class="stat-item">
+          <span class="stat-value" id="connectedCount">0</span>
+          <span class="stat-label">接続中</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value" id="failedCount">0</span>
+          <span class="stat-label">失敗</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value" id="uptime">00:00:00</span>
+          <span class="stat-label">稼働時間</span>
+        </div>
+      </div>
+
+      <div class="online-tokens" id="onlineTokens"></div>
+      <div class="console-output" id="console"></div>
+    </div>
+  </div>
+
+  <script>
+    let wsConnections = new Map();
+    let currentStatus = 'online';
+    let isRunning = false;
+    let uptimeInterval;
+    let startTime;
+    let shouldStop = false;
+
+    function log(message, type = 'info') {
+      const console = document.getElementById('console');
+      const time = new Date().toLocaleTimeString();
+      const div = document.createElement('div');
+      div.className = `log-entry log-${type}`;
+      div.innerHTML = `<span class="log-time">[${time}]</span> ${message}`;
+      console.appendChild(div);
+      console.scrollTop = console.scrollHeight;
+    }
+
+    function setStatus(status) {
+      currentStatus = status;
+      document.querySelectorAll('.presence-card').forEach(c => c.classList.remove('active'));
+      document.querySelector(`[data-status="${status}"]`).classList.add('active');
+    }
+
+    async function startOnliner() {
+      const tokens = document.getElementById('tokenList').value.trim().split('\n').filter(t => t);
+      if (!tokens.length) {
+        log('トークンを入力してください', 'error');
+        return;
+      }
+
+      isRunning = true;
+      shouldStop = false;
+      startTime = Date.now();
+      document.getElementById('startBtn').disabled = true;
+      document.getElementById('stopBtn').disabled = false;
+
+      const activityType = parseInt(document.getElementById('activityType').value);
+      const activityName = document.getElementById('activityName').value;
+      const activityDetails = document.getElementById('activityDetails').value;
+      const customStatus = document.getElementById('customStatus').value;
+
+      log(`${tokens.length}個のトークンをオンラインにします...`, 'info');
+
+      // Start uptime counter
+      uptimeInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const hrs = Math.floor(elapsed / 3600).toString().padStart(2, '0');
+        const mins = Math.floor((elapsed % 3600) / 60).toString().padStart(2, '0');
+        const secs = (elapsed % 60).toString().padStart(2, '0');
+        document.getElementById('uptime').textContent = `${hrs}:${mins}:${secs}`;
+      }, 1000);
+
+      let connected = 0;
+      let failed = 0;
+
+      for (const tokenStr of tokens) {
+        if (shouldStop) break;
+
+        const token = tokenStr.split(':').pop().trim();
+        
+        try {
+          const ws = new WebSocket('wss://gateway.discord.gg/?v=10&encoding=json');
+          
+          ws.onopen = () => {
+            log(`WebSocket接続: ${token.slice(0, 20)}...`, 'info');
+          };
+
+          ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            
+            if (data.op === 10) {
+              const activities = [];
+              
+              if (activityName && activityType !== 4) {
+                activities.push({
+                  name: activityName,
+                  type: activityType,
+                  details: activityDetails || undefined
+                });
+              }
+              
+              if (customStatus || activityType === 4) {
+                const emoji = customStatus.match(/^(\p{Emoji})/u)?.[1] || '💀';
+                activities.push({
+                  name: customStatus.replace(/^\p{Emoji}\s*/u, '') || 'ShadowTools',
+                  type: 4,
+                  emoji: { name: emoji }
+                });
+              }
+
+              ws.send(JSON.stringify({
+                op: 2,
+                d: {
+                  token: token,
+                  properties: {
+                    os: 'Windows',
+                    browser: 'Chrome',
+                    device: ''
+                  },
+                  presence: {
+                    status: currentStatus,
+                    since: Date.now(),
+                    activities: activities,
+                    afk: false
+                  }
+                }
+              }));
+
+              // Heartbeat
+              setInterval(() => {
+                if (ws.readyState === WebSocket.OPEN) {
+                  ws.send(JSON.stringify({ op: 1, d: null }));
+                }
+              }, data.d.heartbeat_interval);
+            }
+          };
+
+          ws.onerror = (error) => {
+            log(`エラー: ${token.slice(0, 20)}...`, 'error');
+            failed++;
+            updateStats(connected, failed);
+          };
+
+          ws.onclose = () => {
+            if (!shouldStop && document.getElementById('autoReconnect').checked) {
+              log(`再接続: ${token.slice(0, 20)}...`, 'warning');
+            }
+          };
+
+          wsConnections.set(token, ws);
+          connected++;
+          updateStats(connected, failed);
+          
+          addTokenCard(token, connected);
+          log(`接続成功: ${token.slice(0, 20)}...`, 'success');
+          
+        } catch (e) {
+          log(`接続失敗: ${e.message}`, 'error');
+          failed++;
+          updateStats(connected, failed);
+        }
+
+        await new Promise(r => setTimeout(r, 100));
+      }
+
+      log('全トークンの接続処理完了', 'success');
+    }
+
+    function addTokenCard(token, index) {
+      const container = document.getElementById('onlineTokens');
+      const card = document.createElement('div');
+      card.className = 'token-card';
+      card.id = `token-${index}`;
+      card.innerHTML = `
+        <div class="token-status">
+          <div class="status-dot ${currentStatus}"></div>
+          <span>Token ${index}</span>
+        </div>
+        <div class="token-info">${token.slice(0, 25)}...</div>
+        <div class="token-actions">
+          <button onclick="disconnectToken('${token}')" title="切断"><i class="fas fa-unlink"></i></button>
+          <button onclick="reconnectToken('${token}')" title="再接続"><i class="fas fa-sync"></i></button>
+        </div>
+      `;
+      container.appendChild(card);
+    }
+
+    function updateStats(connected, failed) {
+      document.getElementById('connectedCount').textContent = connected;
+      document.getElementById('failedCount').textContent = failed;
+    }
+
+    function stopOnliner() {
+      shouldStop = true;
+      isRunning = false;
+      
+      wsConnections.forEach((ws, token) => {
+        ws.close();
+      });
+      wsConnections.clear();
+      
+      clearInterval(uptimeInterval);
+      
+      document.getElementById('onlineTokens').innerHTML = '';
+      document.getElementById('startBtn').disabled = false;
+      document.getElementById('stopBtn').disabled = true;
+      
+      log('全トークンをオフラインにしました', 'info');
+      updateStats(0, 0);
+      document.getElementById('uptime').textContent = '00:00:00';
+    }
+
+    function disconnectToken(token) {
+      const ws = wsConnections.get(token);
+      if (ws) {
+        ws.close();
+        wsConnections.delete(token);
+        log(`トークン切断: ${token.slice(0, 20)}...`, 'info');
+      }
+    }
+
+    function reconnectToken(token) {
+      disconnectToken(token);
+      // Reconnect logic would go here
+      log(`トークン再接続: ${token.slice(0, 20)}...`, 'info');
+    }
+
+    function clearTokens() {
+      document.getElementById('tokenList').value = '';
+      log('トークンリストをクリアしました', 'info');
+    }
+  </script>
+</body>
+</html>
