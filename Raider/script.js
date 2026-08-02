@@ -42,7 +42,7 @@ function parseList(input) {
 }
 
 async function leaveGuild(token, guildId) {
-    const response = await fetch(`https://discord.com/api/v9/users/@me/guilds/${guildId}`, {
+    const response = await fetch(`https:
         'method': 'DELETE',
         'headers': {
             'Authorization': token,
@@ -60,7 +60,6 @@ async function leaveGuild(token, guildId) {
     }
 }
 
-// ファイル読み込み処理
 messageFileInput.addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
@@ -83,7 +82,7 @@ autoFillBtn.addEventListener('click', async () => {
     if (!guildId) return appendLog('⚠️ サーバーIDを入力してください');
     
     try {
-        const response = await fetch(`https://discord.com/api/v9/guilds/${guildId}/channels`, {
+        const response = await fetch(`https:
             'headers': {
                 'Authorization': tokens[0],
                 'Content-Type': 'application/json',
