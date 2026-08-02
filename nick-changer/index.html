@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nickname Changer - ShadowTools</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="tool-container">
+    <div class="tool-header">
+      <h1><i class="fas fa-user-tag"></i> Nickname Changer</h1>
+      <p>一括ニックネーム変更</p>
+    </div>
+
+    <div class="tool-panel">
+      <div class="input-group">
+        <label><i class="fas fa-server"></i> サーバーID</label>
+        <input type="text" id="guildId" placeholder="000000000000000000">
+      </div>
+
+      <div class="nickname-builder">
+        <h3><i class="fas fa-pen"></i> ニックネーム設定</h3>
+        
+        <div class="input-group">
+          <label>新しいニックネーム</label>
+          <input type="text" id="newNickname" placeholder="新しいニックネーム">
+        </div>
+
+        <div class="preset-buttons">
+          <button onclick="applyPreset('ascii')">ASCIIアート</button>
+          <button onclick="applyPreset('random')">ランダム文字</button>
+          <button onclick="applyPreset('invisible')">不可視文字</button>
+          <button onclick="applyPreset('clown')">🤡</button>
+          <button onclick="applyPreset('ghost')">👻</button>
+          <button onclick="applyPreset('crown')">👑</button>
+        </div>
+
+        <div class="options-grid">
+          <label><input type="checkbox" id="useRandom"> ランダム文字列を追加</label>
+          <label><input type="checkbox" id="useAscii"> ASCII装飾</label>
+          <label><input type="checkbox" id="useInvisible"> 不可視文字</label>
+          <label><input type="checkbox" id="useZalgo"> Zalgoテキスト</label>
+          <label><input type="checkbox" id="reverse"> 逆さ文字</label>
+          <label><input type="checkbox" id="leet"> Leet変換</label>
+        </div>
+      </div>
+
+      <div class="target-selection">
+        <h3><i class="fas fa-crosshairs"></i> 対象選択</h3>
+        <div class="radio-group">
+          <label class="radio-card">
+            <input type="radio" name="target" value="self" checked>
+            <span><i class="fas fa-user"></i> 自分のみ</span>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="target" value="all">
+            <span><i class="fas fa-users"></i> 全員（管理者）</span>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="target" value="bots">
+            <span><i class="fas fa-robot"></i> Botのみ</span>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="target" value="specific">
+            <span><i class="fas fa-list"></i> 特定ユーザー</span>
+          </label>
+        </div>
+
+        <div class="input-group" id="specificUsersGroup" style="display: none;">
+          <label>ユーザーIDリスト</label>
+          <textarea id="userIds" placeholder="ユーザーIDを1行ずつ入力..."></textarea>
+          <button class="btn-secondary" onclick="fetchMembers()">
+            <i class="fas fa-download"></i> メンバー取得
+          </button>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label><i class="fas fa-key"></i> トークン</label>
+        <textarea id="tokenList" placeholder="トークンを1行ずつ入力..."></textarea>
+      </div>
+
+      <div class="config-grid">
+        <div class="input-group">
+          <label><i class="fas fa-clock"></i> 遅延 (ms)</label>
+          <input type="number" id="delay" value="1000">
+        </div>
+        <div class="input-group">
+          <label><i class="fas fa-percentage"></i> 成功率目標</label>
+          <input type="number" id="successRate" value="100" min="1" max="100">
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button class="btn-primary btn-large" onclick="startChange()">
+          <i class="fas fa-play"></i> 変更開始
+        </button>
+        <button class="btn-secondary" onclick="resetNicks()">
+          <i class="fas fa-undo"></i> 元に戻す
+        </button>
+        <button class="btn-danger" onclick="massReset()">
+          <i class="fas fa-broom"></i> 全リセット
+        </button>
+      </div>
+
+      <div class="preview-section">
+        <h3><i class="fas fa-eye"></i> プレビュー</h3>
+        <div class="nickname-preview" id="preview">Preview</div>
+        <button class="btn-secondary" onclick="updatePreview()">
+          <i class="fas fa-sync"></i> 更新
+        </button>
+      </div>
+
+      <div class="results-panel" id="resultsPanel">
+        <h3>結果</h3>
+        <div class="results-list" id="resultsList"></div>
+      </div>
+
+      <div class="console-output" id="console"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'https://discord.com/api/v9';
+    let originalNicks = new Map();
+
+    function log(message, type = 'info') {
+      const console = document.getElementById('console');
+      const time = new Date().toLocaleTimeString();
+      const div = document.createElement('div');
+      div.className = `log-entry log-${type}`;
+      div.innerHTML = `<span class="log-time">[${time}]</span> ${message}`;
+      console.appendChild(div);
+      console.scrollTop = console.scrollHeight;
+    }
+
+    function applyPreset(preset) {
+      const input = document.getElementById('newNickname');
+      const presets = {
+        ascii: '【Shadow】',
+        random: generateRandomString(8),
+        invisible: 'ㅤ',
+        clown: '🤡',
+        ghost: '👻',
+        crown: '👑'
+      };
+      input.value = presets[preset] || '';
+      updatePreview();
+    }
+
+    function generateRandomString(length) {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let result = '';
+      for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return result;
+    }
+
+    function toZalgo(text) {
+      const zalgo = ['̍','̎','̄','̅','̿','̑','̆','̐','͒','͗','͑','̇','̈','̊','͂','̓','̈́','͊','͋','͌','̃','̂','̌','͐','͠','̚','̖','̗','̘','̙','̜','̝','̞','̟','̠','̤','̥','̦','̩','̪','̫','̬','̭','̮','̯','̰','̱','̲','̳','̹','̺','̻','̼','ͅ','͇','͈','͉','͍','͎','͓','͔','͕','͖','͙','͚','̣'];
+      return text.split('').map(c => c + zalgo[Math.floor(Math.random() * zalgo.length)]).join('');
+    }
+
+    function toLeet(text) {
+      const leet = { 'a': '4', 'e': '3', 'i': '1', 'o': '0', 's': '5', 't': '7', 'A': '4', 'E': '3', 'I': '1', 'O': '0', 'S': '5', 'T': '7' };
+      return text.replace(/[aeiosstAEIOSST]/g, c => leet[c] || c);
+    }
+
+    function reverseString(text) {
+      return text.split('').reverse().join('');
+    }
+
+    function updatePreview() {
+      let nick = document.getElementById('newNickname').value || 'Preview';
+      
+      if (document.getElementById('useRandom').checked) {
+        nick += ' ' + generateRandomString(5);
+      }
+      if (document.getElementById('useAscii').checked) {
+        nick = '【' + nick + '】';
+      }
+      if (document.getElementById('useZalgo').checked) {
+        nick = toZalgo(nick);
+      }
+      if (document.getElementById('leet').checked) {
+        nick = toLeet(nick);
+      }
+      if (document.getElementById('reverse').checked) {
+        nick = reverseString(nick);
+      }
+      if (document.getElementById('useInvisible').checked) {
+        nick = 'ㅤ' + nick + 'ㅤ';
+      }
+      
+      document.getElementById('preview').textContent = nick.substring(0, 32);
+    }
+
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      cb.addEventListener('change', updatePreview);
+    });
+
+    document.getElementById('newNickname').addEventListener('input', updatePreview);
+
+    async function fetchMembers() {
+      const guildId = document.getElementById('guildId').value.trim();
+      const tokens = document.getElementById('tokenList').value.trim().split('\n').filter(t => t);
+      
+      if (!guildId || !tokens.length) {
+        log('サーバーIDとトークンを入力してください', 'error');
+        return;
+      }
+
+      log('メンバー取得中...', 'info');
+      
+      try {
+        const token = tokens[0].split(':').pop().trim();
+        const response = await fetch(`${API_BASE}/guilds/${guildId}/members?limit=1000`, {
+          headers: { 'Authorization': token }
+        });
+        
+        if (response.ok) {
+          const members = await response.json();
+          const ids = members.map(m => m.user.id).join('\n');
+          document.getElementById('userIds').value = ids;
+          log(`${members.length}人のメンバーを取得しました`, 'success');
+        } else {
+          log(`取得失敗: ${response.status}`, 'error');
+        }
+      } catch (e) {
+        log(`エラー: ${e.message}`, 'error');
+      }
+    }
+
+    async function startChange() {
+      const guildId = document.getElementById('guildId').value.trim();
+      const tokens = document.getElementById('tokenList').value.trim().split('\n').filter(t => t);
+      const target = document.querySelector('input[name="target"]:checked').value;
+      const delay = parseInt(document.getElementById('delay').value) || 1000;
+      
+      if (!guildId || !tokens.length) {
+        log('サーバーIDとトークンを入力してください', 'error');
+        return;
+      }
+
+      let nick = document.getElementById('newNickname').value;
+      if (document.getElementById('useRandom').checked) nick += ' ' + generateRandomString(5);
+      if (document.getElementById('useAscii').checked) nick = '【' + nick + '】';
+      if (document.getElementById('useZalgo').checked) nick = toZalgo(nick);
+      if (document.getElementById('leet').checked) nick = toLeet(nick);
+      if (document.getElementById('reverse').checked) nick = reverseString(nick);
+
+      // Truncate to 32 chars
+      nick = nick.substring(0, 32);
+
+      let userIds = [];
+      if (target === 'specific') {
+        userIds = document.getElementById('userIds').value.trim().split('\n').filter(u => u);
+      } else if (target === 'self') {
+        // Will use @me
+      }
+
+      log(`ニックネーム変更開始: ${nick}`, 'info');
+
+      const results = document.getElementById('resultsList');
+      results.innerHTML = '';
+
+      for (const tokenStr of tokens) {
+        const token = tokenStr.split(':').pop().trim();
+        
+        try {
+          let response;
+          
+          if (target === 'self') {
+            response = await fetch(`${API_BASE}/guilds/${guildId}/members/@me`, {
+              method: 'PATCH',
+              headers: {
+                'Authorization': token,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ nick })
+            });
+          } else if (target === 'all' || target === 'bots') {
+            // Need to fetch members first
+            const membersRes = await fetch(`${API_BASE}/guilds/${guildId}/members?limit=1000`, {
+              headers: { 'Authorization': token }
+            });
+            
+            if (membersRes.ok) {
+              const members = await membersRes.json();
+              const targets = target === 'bots' ? 
+                members.filter(m => m.user.bot) : 
+                members.filter(m => !m.user.bot);
+              
+              for (const member of targets) {
+                response = await fetch(`${API_BASE}/guilds/${guildId}/members/${member.user.id}`, {
+                  method: 'PATCH',
+                  headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({ nick })
+                });
+                
+                if (response.ok) {
+                  log(`${member.user.username}のニックネームを変更`, 'success');
+                }
+                
+                await new Promise(r => setTimeout(r, delay));
+              }
+            }
+          } else if (target === 'specific') {
+            for (const userId of userIds) {
+              response = await fetch(`${API_BASE}/guilds/${guildId}/members/${userId}`, {
+                method: 'PATCH',
+                headers: {
+                  'Authorization': token,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ nick })
+              });
+              
+              if (response.ok) {
+                log(`ユーザー${userId}のニックネームを変更`, 'success');
+              }
+              
+              await new Promise(r => setTimeout(r, delay));
+            }
+          }
+
+          if (response && response.ok) {
+            log('ニックネーム変更成功', 'success');
+          }
+        } catch (e) {
+          log(`エラー: ${e.message}`, 'error');
+        }
+      }
+    }
+
+    async function resetNicks() {
+      // Reset to original
+      log('元のニックネームに戻します...', 'info');
+    }
+
+    async function massReset() {
+      const guildId = document.getElementById('guildId').value.trim();
+      const tokens = document.getElementById('tokenList').value.trim().split('\n').filter(t => t);
+      
+      if (!confirm('全員のニックネームをリセットしますか？')) return;
+      
+      log('全ニックネームリセット開始...', 'info');
+      
+      for (const tokenStr of tokens) {
+        const token = tokenStr.split(':').pop().trim();
+        await fetch(`${API_BASE}/guilds/${guildId}/members/@me`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': token,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ nick: null })
+        });
+      }
+      
+      log('リセット完了', 'success');
+    }
+
+    // Show/hide specific users input
+    document.querySelectorAll('input[name="target"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        document.getElementById('specificUsersGroup').style.display = 
+          e.target.value === 'specific' ? 'block' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>
