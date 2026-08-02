@@ -1,5 +1,4 @@
 :root {
-  /* Colors */
   --bg-primary: #0a0a0f;
   --bg-secondary: #12121a;
   --bg-tertiary: #1a1a25;
@@ -21,26 +20,22 @@
   --border-color: #2a2a3a;
   --border-hover: #3a3a4a;
   
-  /* Shadows */
   --shadow-sm: 0 2px 4px rgba(0,0,0,0.3);
   --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
   --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
   --shadow-glow: 0 0 20px rgba(0, 212, 255, 0.3);
   --shadow-glow-pink: 0 0 20px rgba(255, 0, 110, 0.3);
   
-  /* Transitions */
   --transition-fast: 0.15s ease;
   --transition-normal: 0.3s ease;
   --transition-slow: 0.5s ease;
   
-  /* Border Radius */
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
   --radius-xl: 24px;
 }
 
-/* Reset & Base */
 * {
   margin: 0;
   padding: 0;
@@ -60,7 +55,6 @@ body {
   overflow-x: hidden;
 }
 
-/* Background Effects */
 .bg-grid {
   position: fixed;
   top: 0;
@@ -120,7 +114,6 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
-/* Header */
 .main-header {
   position: fixed;
   top: 0;
@@ -176,7 +169,6 @@ body {
   font-weight: 600;
 }
 
-/* Header Navigation */
 .header-nav {
   display: flex;
   gap: 10px;
@@ -204,7 +196,6 @@ body {
   box-shadow: inset 0 0 0 1px var(--border-color);
 }
 
-/* Header Stats */
 .header-stats {
   display: flex;
   gap: 25px;
@@ -224,14 +215,12 @@ body {
   font-size: 16px;
 }
 
-/* Main Container */
 .main-container {
   display: flex;
   margin-top: 70px;
   min-height: calc(100vh - 70px);
 }
 
-/* Sidebar */
 .sidebar {
   width: 280px;
   background: var(--bg-secondary);
@@ -301,7 +290,6 @@ body {
   padding: 10px;
 }
 
-/* System Info */
 .system-info {
   background: var(--bg-tertiary);
   border-radius: var(--radius-md);
@@ -340,7 +328,6 @@ body {
   color: var(--accent-red);
 }
 
-/* Content Area */
 .content-area {
   flex: 1;
   margin-left: 280px;
@@ -361,7 +348,6 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Welcome Banner */
 .welcome-banner {
   background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(255, 0, 110, 0.1));
   border: 1px solid var(--border-color);
@@ -422,7 +408,6 @@ body {
   font-size: 20px;
 }
 
-/* Panel */
 .panel {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
@@ -486,7 +471,6 @@ body {
   padding: 25px;
 }
 
-/* Token Input */
 .token-input {
   width: 100%;
   min-height: 120px;
@@ -519,7 +503,6 @@ body {
   font-size: 14px;
 }
 
-/* Buttons */
 .btn-primary,
 .btn-secondary,
 .btn-success,
@@ -573,7 +556,6 @@ body {
   box-shadow: var(--shadow-glow-pink);
 }
 
-/* Section Title */
 .section-title {
   font-size: 20px;
   margin-bottom: 20px;
@@ -586,7 +568,6 @@ body {
   color: var(--accent-cyan);
 }
 
-/* Tools Grid */
 .tools-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -682,7 +663,6 @@ body {
   transform: translateX(5px);
 }
 
-/* Quick Actions */
 .quick-actions-panel {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
@@ -740,7 +720,6 @@ body {
   border-color: var(--accent-red);
 }
 
-/* Settings */
 .settings-container h2 {
   font-family: 'Orbitron', sans-serif;
   font-size: 28px;
@@ -832,7 +811,6 @@ body {
   gap: 15px;
 }
 
-/* Floating Console */
 .floating-console {
   position: fixed;
   bottom: 80px;
@@ -967,7 +945,6 @@ body {
   background: var(--accent-pink);
 }
 
-/* Console Toggle */
 .console-toggle {
   position: fixed;
   bottom: 20px;
@@ -989,7 +966,6 @@ body {
   transform: scale(1.1);
 }
 
-/* Footer */
 .main-footer {
   margin-left: 280px;
   padding: 20px 30px;
@@ -1038,7 +1014,6 @@ body {
   color: var(--accent-cyan);
 }
 
-/* Animations */
 @keyframes pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.8; transform: scale(1.05); }
@@ -1048,7 +1023,6 @@ body {
   animation: pulse 2s infinite;
 }
 
-/* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -1067,7 +1041,6 @@ body {
   background: var(--accent-cyan);
 }
 
-/* Responsive */
 @media (max-width: 1024px) {
   .sidebar {
     transform: translateX(-100%);
