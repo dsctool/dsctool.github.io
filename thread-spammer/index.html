@@ -247,10 +247,9 @@
 
         let threadName = name;
         if (randomName) threadName = generateRandomName();
-        if (increment) threadName += ` #${i + 1}`;
+        if (increment) threadName += `
         if (mention) threadName = '@everyone ' + threadName;
 
-        // Truncate to 100 chars
         threadName = threadName.substring(0, 100);
 
         const token = tokens[i % tokens.length].split(':').pop().trim();
@@ -290,7 +289,6 @@
             createdThreads.push(thread.id);
             log(`スレッド作成: ${threadName}`, 'success');
 
-            // Send initial message
             if (message) {
               await fetch(`${API_BASE}/channels/${thread.id}/messages`, {
                 method: 'POST',
@@ -302,12 +300,11 @@
               });
             }
 
-            // Add to visual list
             const container = document.getElementById('createdThreads');
             const div = document.createElement('div');
             div.className = 'thread-item';
             div.innerHTML = `
-              <span>#${thread.name}</span>
+              <span>
               <button onclick="deleteThread('${thread.id}')"><i class="fas fa-trash"></i></button>
             `;
             container.appendChild(div);
