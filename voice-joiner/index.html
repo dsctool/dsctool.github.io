@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voice Joiner - ShadowTools</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="tool-container">
+    <div class="tool-header">
+      <h1><i class="fas fa-microphone"></i> Voice Joiner</h1>
+      <p>ボイスチャンネルへの自動参加</p>
+    </div>
+
+    <div class="tool-panel">
+      <div class="connection-info">
+        <div class="input-group">
+          <label><i class="fas fa-server"></i> サーバーID</label>
+          <input type="text" id="guildId" placeholder="000000000000000000">
+        </div>
+
+        <div class="input-group">
+          <label><i class="fas fa-headphones"></i> ボイスチャンネルID</label>
+          <div class="channel-input">
+            <input type="text" id="channelId" placeholder="000000000000000000">
+            <button class="btn-secondary" onclick="fetchVoiceChannels()">
+              <i class="fas fa-list"></i> 取得
+            </button>
+          </div>
+        </div>
+
+        <div class="channel-list" id="channelList"></div>
+      </div>
+
+      <div class="voice-settings">
+        <h3><i class="fas fa-sliders-h"></i> 参加設定</h3>
+        <div class="settings-grid">
+          <label class="setting-item">
+            <input type="checkbox" id="mute" checked>
+            <span><i class="fas fa-microphone-slash"></i> ミュート</span>
+          </label>
+          <label class="setting-item">
+            <input type="checkbox" id="deafen">
+            <span><i class="fas fa-deaf"></i> スピーカーミュート</span>
+          </label>
+          <label class="setting-item">
+            <input type="checkbox" id="video">
+            <span><i class="fas fa-video"></i> カメラ</span>
+          </label>
+          <label class="setting-item">
+            <input type="checkbox" id="stream">
+            <span><i class="fas fa-desktop"></i> 画面共有</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="audio-section">
+        <h3><i class="fas fa-music"></i> オーディオ設定</h3>
+        <div class="audio-options">
+          <label><input type="radio" name="audioType" value="none" checked> なし</label>
+          <label><input type="radio" name="audioType" value="file"> ファイル再生</label>
+          <label><input type="radio" name="audioType" value="mic"> マイク入力</label>
+          <label><input type="radio" name="audioType" value="tts"> TTS</label>
+        </div>
+
+        <div class="file-input" id="fileInput" style="display: none;">
+          <input type="file" id="audioFile" accept="audio/*">
+          <small>対応形式: MP3, WAV, OGG</small>
+        </div>
+
+        <div class="tts-input" id="ttsInput" style="display: none;">
+          <textarea id="ttsText" placeholder="読み上げるテキスト..."></textarea>
+          <select id="ttsVoice">
+            <option value="ja-JP">日本語</option>
+            <option value="en-US">英語</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label><i class="fas fa-key"></i> トークン</label>
+        <textarea id="tokenList" placeholder="トークンを1行ずつ入力..."></textarea>
+      </div>
+
+      <div class="advanced-settings">
+        <h3 onclick="toggleAdvanced()">
+          <i class="fas fa-cog"></i> 詳細設定
+          <i class="fas fa-chevron-down" id="advancedIcon"></i>
+        </h3>
+        <div class="advanced-content" id="advancedContent" style="display: none;">
+          <div class="config-grid">
+            <div class="input-group">
+              <label>UDPプロトコル</label>
+              <select id="udpProtocol">
+                <option value="xsalsa20_poly1305">XSalsa20 Poly1305</option>
+                <option value="xsalsa20_poly1305_suffix">XSalsa20 Poly1305 Suffix</option>
+                <option value="xsalsa20_poly1305_lite">XSalsa20 Poly1305 Lite</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>ビットレート</label>
+              <select id="bitrate">
+                <option value="64000">64 kbps</option>
+                <option value="128000" selected>128 kbps</option>
+                <option value="256000">256 kbps</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>チャンネル</label>
+              <select id="channels">
+                <option value="1">モノラル</option>
+                <option value="2" selected>ステレオ</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>サンプルレート</label>
+              <select id="sampleRate">
+                <option value="48000" selected>48 kHz</option>
+                <option value="44100">44.1 kHz</option>
+                <option value="24000">24 kHz</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button class="btn-primary btn-large" id="joinBtn" onclick="joinVoice()">
+          <i class="fas fa-sign-in-alt"></i> 参加
+        </button>
+        <button class="btn-danger" id="leaveBtn" onclick="leaveVoice()">
+          <i class="fas fa-sign-out-alt"></i> 退出
+        </button>
+        <button class="btn-secondary" onclick="leaveAll()">
+          <i class="fas fa-running"></i> 全退出
+        </button>
+      </div>
+
+      <div class="voice-status" id="voiceStatus">
+        <div class="status-item disconnected">
+          <i class="fas fa-circle"></i> 未接続
+        </div>
+      </div>
+
+      <div class="connected-tokens" id="connectedTokens"></div>
+      <div class="console-output" id="console"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'https://discord.com/api/v9';
+    const GATEWAY = 'wss://gateway.discord.gg/?v=10&encoding=json';
+    let voiceConnections = new Map();
+    let wsConnections = new Map();
+
+    function log(message, type = 'info') {
+      const console = document.getElementById('console');
+      const time = new Date().toLocaleTimeString();
+      const div = document.createElement('div');
+      div.className = `log-entry log-${type}`;
+      div.innerHTML = `<span class="log-time">[${time}]</span> ${message}`;
+      console.appendChild(div);
+      console.scrollTop = console.scrollHeight;
+    }
+
+    async function fetchVoiceChannels() {
+      const guildId = document.getElementById('guildId').value.trim();
+      const tokens = document.getElementById('tokenList').value.trim().split('\n').filter(t => t);
+      
+      if (!guildId || !tokens.length) {
+        log('サーバーIDとトークンを入力してください', 'error');
+        return;
+      }
+
+      try {
+        const token = tokens[0].split(':').pop().trim();
+        const response = await fetch(`${API_BASE}/guilds/${guildId}/channels`, {
+          headers: { 'Authorization': token }
+        });
+
+        if (response.ok) {
+          const channels = await response.json();
+          const voiceChannels = channels.filter(c => c.type === 2);
+          
+          const list = document.getElementById('channelList');
+          list.innerHTML = voiceChannels.map(c => `
+            <div class="channel-item" onclick="selectChannel('${c.id}')">
+              <i class="fas fa-volume-up"></i>
+              <span>${c.name}</span>
+              <span class="user-count">${c.user_limit || '∞'}</span>
+            </div>
+          `).join('');
+          
+          log(`${voiceChannels.length}個のボイスチャンネルを取得`, 'success');
+        }
+      } catch (e) {
+        log(`エラー: ${e.message}`, 'error');
+      }
+    }
+
+    function selectChannel(channelId) {
+      document.getElementById('channelId').value = channelId;
+      log(`チャンネル選択: ${channelId}`, 'info');
+    }
+
+    function toggleAdvanced() {
+      const content = document.getElementById('advancedContent');
+      const icon = document.getElementById('advancedIcon');
+      content.style.display = content.style.display === 'none' ? 'block' : 'none';
+      icon.className = content.style.display === 'none' ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
+    }
+
+    async function joinVoice() {
+      const guildId = document.getElementById('guildId').value.trim();
+      const channelId = document.getElementById('channelId').value.trim();
+      const tokens = document.getElementById('tokenList').value.trim().split('\n').filter(t => t);
+      
+      if (!guildId || !channelId || !tokens.length) {
+        log('サーバーID、チャンネルID、トークンを入力してください', 'error');
+        return;
+      }
+
+      const mute = document.getElementById('mute').checked;
+      const deaf = document.getElementById('deafen').checked;
+      const video = document.getElementById('video').checked;
+
+      log(`${tokens.length}個のトークンでボイスチャンネルに参加します...`, 'info');
+
+      for (const tokenStr of tokens) {
+        const token = tokenStr.split(':').pop().trim();
+        
+        try {
+          // Connect to gateway
+          const ws = new WebSocket(GATEWAY);
+          
+          ws.onopen = () => {
+            log(`Gateway接続: ${token.slice(0, 20)}...`, 'info');
+          };
+
+          ws.onmessage = async (event) => {
+            const data = JSON.parse(event.data);
+            
+            if (data.op === 10) {
+              // Identify
+              ws.send(JSON.stringify({
+                op: 2,
+                d: {
+                  token: token,
+                  properties: { os: 'Windows', browser: 'Chrome', device: '' }
+                }
+              }));
+
+              // Voice state update
+              setTimeout(() => {
+                ws.send(JSON.stringify({
+                  op: 4,
+                  d: {
+                    guild_id: guildId,
+                    channel_id: channelId,
+                    self_mute: mute,
+                    self_deaf: deaf,
+                    self_video: video
+                  }
+                }));
+              }, 1000);
+            }
+
+            if (data.op === 4 && data.d && data.d.token) {
+              // Voice server update - connect to voice
+              log(`ボイスサーバー接続: ${data.d.endpoint}`, 'success');
+            }
+          };
+
+          wsConnections.set(token, ws);
+          
+          // Add to visual list
+          addTokenStatus(token, 'connecting');
+          
+        } catch (e) {
+          log(`接続失敗: ${e.message}`, 'error');
+        }
+
+        await new Promise(r => setTimeout(r, 500));
+      }
+
+      updateStatus('connected');
+    }
+
+    function addTokenStatus(token, status) {
+      const container = document.getElementById('connectedTokens');
+      const div = document.createElement('div');
+      div.className = `token-voice-status ${status}`;
+      div.id = `voice-${token.slice(0, 10)}`;
+      div.innerHTML = `
+        <i class="fas fa-microphone${status === 'muted' ? '-slash' : ''}"></i>
+        <span>${token.slice(0, 20)}...</span>
+        <span class="status-badge">${status}</span>
+        <button onclick="disconnectToken('${token}')"><i class="fas fa-times"></i></button>
+      `;
+      container.appendChild(div);
+    }
+
+    async function leaveVoice() {
+      const guildId = document.getElementById('guildId').value.trim();
+      
+      wsConnections.forEach((ws, token) => {
+        ws.send(JSON.stringify({
+          op: 4,
+          d: {
+            guild_id: guildId,
+            channel_id: null,
+            self_mute: false,
+            self_deaf: false
+          }
+        }));
+        ws.close();
+      });
+      
+      wsConnections.clear();
+      document.getElementById('connectedTokens').innerHTML = '';
+      updateStatus('disconnected');
+      
+      log('ボイスチャンネルから退出しました', 'info');
+    }
+
+    function leaveAll() {
+      leaveVoice();
+    }
+
+    function disconnectToken(token) {
+      const ws = wsConnections.get(token);
+      if (ws) {
+        ws.close();
+        wsConnections.delete(token);
+        document.getElementById(`voice-${token.slice(0, 10)}`)?.remove();
+      }
+    }
+
+    function updateStatus(status) {
+      const statusEl = document.getElementById('voiceStatus');
+      const icons = {
+        connected: '<i class="fas fa-circle connected"></i> 接続中',
+        disconnected: '<i class="fas fa-circle disconnected"></i> 未接続',
+        connecting: '<i class="fas fa-spinner fa-spin"></i> 接続中...'
+      };
+      statusEl.innerHTML = `<div class="status-item ${status}">${icons[status]}</div>`;
+    }
+
+    // Audio type toggle
+    document.querySelectorAll('input[name="audioType"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        document.getElementById('fileInput').style.display = 
+          e.target.value === 'file' ? 'block' : 'none';
+        document.getElementById('ttsInput').style.display = 
+          e.target.value === 'tts' ? 'block' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>
