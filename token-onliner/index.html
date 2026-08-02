@@ -150,7 +150,6 @@
 
       log(`${tokens.length}個のトークンをオンラインにします...`, 'info');
 
-      // Start uptime counter
       uptimeInterval = setInterval(() => {
         const elapsed = Math.floor((Date.now() - startTime) / 1000);
         const hrs = Math.floor(elapsed / 3600).toString().padStart(2, '0');
@@ -215,7 +214,6 @@
                 }
               }));
 
-              // Heartbeat
               setInterval(() => {
                 if (ws.readyState === WebSocket.OPEN) {
                   ws.send(JSON.stringify({ op: 1, d: null }));
@@ -310,7 +308,6 @@
 
     function reconnectToken(token) {
       disconnectToken(token);
-      // Reconnect logic would go here
       log(`トークン再接続: ${token.slice(0, 20)}...`, 'info');
     }
 
