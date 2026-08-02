@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thread Spammer - ShadowTools</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="tool-container">
+    <div class="tool-header">
+      <h1><i class="fas fa-comments"></i> Thread Spammer</h1>
+      <p>スレッドの自動作成</p>
+    </div>
+
+    <div class="tool-panel">
+      <div class="thread-type-tabs">
+        <button class="type-btn active" onclick="setThreadType('new')">
+          <i class="fas fa-plus-circle"></i> 新規スレッド
+        </button>
+        <button class="type-btn" onclick="setThreadType('message')">
+          <i class="fas fa-comment"></i> メッセージから
+        </button>
+        <button class="type-btn" onclick="setThreadType('forum')">
+          <i class="fas fa-newspaper"></i> フォーラム投稿
+        </button>
+      </div>
+
+      <div class="input-group">
+        <label><i class="fas fa-hashtag"></i> 親チャンネルID</label>
+        <input type="text" id="parentChannel" placeholder="000000000000000000">
+        <button class="btn-secondary" onclick="fetchThreads()">
+          <i class="fas fa-sync"></i> 既存スレッド取得
+        </button>
+      </div>
+
+      <div class="input-group" id="messageIdGroup" style="display: none;">
+        <label><i class="fas fa-link"></i> メッセージID</label>
+        <input type="text" id="messageId" placeholder="メッセージIDまたはリンク">
+      </div>
+
+      <div class="thread-config">
+        <div class="input-group">
+          <label><i class="fas fa-heading"></i> スレッド名</label>
+          <input type="text" id="threadName" placeholder="スレッド名">
+          <div class="name-options">
+            <label><input type="checkbox" id="randomName"> ランダム名</label>
+            <label><input type="checkbox" id="incrementName"> 連番</label>
+            <label><input type="checkbox" id="mentionName"> @everyone含める</label>
+          </div>
+        </div>
+
+        <div class="name-presets">
+          <button onclick="setNamePreset('general')">雑談</button>
+          <button onclick="setNamePreset('spam')">スパム</button>
+          <button onclick="setNamePreset('raid')">レイド</button>
+          <button onclick="setNamePreset('random')">ランダム</button>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label><i class="fas fa-comment-alt"></i> 初期メッセージ</label>
+        <textarea id="initialMessage" placeholder="スレッドの最初のメッセージ..."></textarea>
+        <div class="message-options">
+          <label><input type="checkbox" id="spamMessage"> スパムメッセージ</label>
+          <label><input type="checkbox" id="embedMessage"> Embedを使用</label>
+        </div>
+      </div>
+
+      <div class="thread-settings">
+        <h3><i class="fas fa-cog"></i> スレッド設定</h3>
+        <div class="config-grid">
+          <div class="input-group">
+            <label>自動アーカイブ</label>
+            <select id="autoArchive">
+              <option value="60">1時間</option>
+              <option value="1440" selected>24時間</option>
+              <option value="4320">3日</option>
+              <option value="10080">7日</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>低速モード</label>
+            <select id="slowmode">
+              <option value="0">なし</option>
+              <option value="5">5秒</option>
+              <option value="10">10秒</option>
+              <option value="60">1分</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>タイプ</label>
+            <select id="threadType">
+              <option value="11">公開スレッド</option>
+              <option value="12">プライベートスレッド</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label><i class="fas fa-key"></i> トークン</label>
+        <textarea id="tokenList" placeholder="トークンを1行ずつ入力..."></textarea>
+      </div>
+
+      <div class="config-grid">
+        <div class="input-group">
+          <label><i class="fas fa-plus"></i> 作成数</label>
+          <input type="number" id="createAmount" value="10" min="1" max="100">
+        </div>
+        <div class="input-group">
+          <label><i class="fas fa-clock"></i> 遅延 (ms)</label>
+          <input type="number" id="delay" value="1000" min="100">
+        </div>
+        <div class="input-group">
+          <label><i class="fas fa-bolt"></i> 並列数</label>
+          <input type="number" id="threads" value="5" min="1" max="20">
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button class="btn-primary btn-large" id="startBtn" onclick="startSpam()">
+          <i class="fas fa-play"></i> 作成開始
+        </button>
+        <button class="btn-danger" id="stopBtn" onclick="stopSpam()" disabled>
+          <i class="fas fa-stop"></i> 停止
+        </button>
+        <button class="btn-secondary" onclick="deleteThreads()">
+          <i class="fas fa-trash"></i> 全削除
+        </button>
+      </div>
+
+      <div class="progress-section">
+        <div class="progress-bar">
+          <div id="progressFill"></div>
+        </div>
+        <div class="progress-text">
+          <span>作成: <b id="createdCount">0</b></span>
+          <span>失敗: <b id="failedCount">0</b></span>
+        </div>
+      </div>
+
+      <div class="created-threads" id="createdThreads"></div>
+      <div class="console-output" id="console"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'https://discord.com/api/v9';
+    let threadType = 'new';
+    let isRunning = false;
+    let shouldStop = false;
+    let createdThreads = [];
+
+    function log(message, type = 'info') {
+      const console = document.getElementById('console');
+      const time = new Date().toLocaleTimeString();
+      const div = document.createElement('div');
+      div.className = `log-entry log-${type}`;
+      div.innerHTML = `<span class="log-time">[${time}]</span> ${message}`;
+      console.appendChild(div);
+      console.scrollTop = console.scrollHeight;
+    }
+
+    function setThreadType(type) {
+      threadType = type;
+      document.querySelectorAll('.type-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.closest('.type-btn').classList.add('active');
+      document.getElementById('messageIdGroup').style.display = type === 'message' ? 'block' : 'none';
+    }
+
+    function setNamePreset(preset) {
+      const presets = {
+        general: '雑談スレッド',
+        spam: 'スパム',
+        raid: '🚨レイド中🚨',
+        random: generateRandomName()
+      };
+      document.getElementById('threadName').value = presets[preset] || '';
+    }
+
+    function generateRandomName() {
+      const adjectives = ['クール', 'ホット', 'ダーク', 'シャドウ', 'シークレット', 'スペシャル'];
+      const nouns = ['スレッド', '部屋', 'チャット', 'トーク', 'ディスカッション'];
+      return adjectives[Math.floor(Math.random() * adjectives.length)] + 
+             nouns[Math.floor(Math.random() * nouns.length)] + 
+             Math.floor(Math.random() * 999);
+    }
+
+    async function fetchThreads() {
+      const channelId = document.getElementById('parentChannel').value.trim();
+      const tokens = document.getElementById('tokenList').value.trim().split('\n').filter(t => t);
+      
+      if (!channelId || !tokens.length) {
+        log('チャンネルIDとトークンを入力してください', 'error');
+        return;
+      }
+
+      try {
+        const token = tokens[0].split(':').pop().trim();
+        const response = await fetch(`${API_BASE}/channels/${channelId}/threads/active`, {
+          headers: { 'Authorization': token }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          log(`${data.threads.length}個のアクティブスレッドを取得`, 'success');
+        }
+      } catch (e) {
+        log(`エラー: ${e.message}`, 'error');
+      }
+    }
+
+    async function startSpam() {
+      const channelId = document.getElementById('parentChannel').value.trim();
+      const tokens = document.getElementById('tokenList').value.trim().split('\n').filter(t => t);
+      const name = document.getElementById('threadName').value || 'スレッド';
+      const message = document.getElementById('initialMessage').value;
+      const amount = parseInt(document.getElementById('createAmount').value) || 10;
+      const delay = parseInt(document.getElementById('delay').value) || 1000;
+      const threadCount = parseInt(document.getElementById('threads').value) || 5;
+      const autoArchive = parseInt(document.getElementById('autoArchive').value);
+      const type = parseInt(document.getElementById('threadType').value);
+      const randomName = document.getElementById('randomName').checked;
+      const increment = document.getElementById('incrementName').checked;
+      const mention = document.getElementById('mentionName').checked;
+
+      if (!channelId || !tokens.length) {
+        log('チャンネルIDとトークンを入力してください', 'error');
+        return;
+      }
+
+      isRunning = true;
+      shouldStop = false;
+      document.getElementById('startBtn').disabled = true;
+      document.getElementById('stopBtn').disabled = false;
+      createdThreads = [];
+
+      log(`${amount}個のスレッドを作成します...`, 'info');
+
+      let created = 0, failed = 0;
+
+      for (let i = 0; i < amount; i++) {
+        if (shouldStop) break;
+
+        let threadName = name;
+        if (randomName) threadName = generateRandomName();
+        if (increment) threadName += ` #${i + 1}`;
+        if (mention) threadName = '@everyone ' + threadName;
+
+        // Truncate to 100 chars
+        threadName = threadName.substring(0, 100);
+
+        const token = tokens[i % tokens.length].split(':').pop().trim();
+
+        try {
+          let response;
+          const body = {
+            name: threadName,
+            auto_archive_duration: autoArchive,
+            type: type
+          };
+
+          if (threadType === 'message') {
+            const messageId = document.getElementById('messageId').value.trim();
+            response = await fetch(`${API_BASE}/channels/${channelId}/messages/${messageId}/threads`, {
+              method: 'POST',
+              headers: {
+                'Authorization': token,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(body)
+            });
+          } else {
+            response = await fetch(`${API_BASE}/channels/${channelId}/threads`, {
+              method: 'POST',
+              headers: {
+                'Authorization': token,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(body)
+            });
+          }
+
+          if (response.ok) {
+            const thread = await response.json();
+            created++;
+            createdThreads.push(thread.id);
+            log(`スレッド作成: ${threadName}`, 'success');
+
+            // Send initial message
+            if (message) {
+              await fetch(`${API_BASE}/channels/${thread.id}/messages`, {
+                method: 'POST',
+                headers: {
+                  'Authorization': token,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ content: message })
+              });
+            }
+
+            // Add to visual list
+            const container = document.getElementById('createdThreads');
+            const div = document.createElement('div');
+            div.className = 'thread-item';
+            div.innerHTML = `
+              <span>#${thread.name}</span>
+              <button onclick="deleteThread('${thread.id}')"><i class="fas fa-trash"></i></button>
+            `;
+            container.appendChild(div);
+
+          } else {
+            failed++;
+            log(`作成失敗: ${response.status}`, 'error');
+            if (response.status === 429) {
+              await new Promise(r => setTimeout(r, 5000));
+            }
+          }
+        } catch (e) {
+          failed++;
+          log(`エラー: ${e.message}`, 'error');
+        }
+
+        document.getElementById('createdCount').textContent = created;
+        document.getElementById('failedCount').textContent = failed;
+        document.getElementById('progressFill').style.width = `${((i + 1) / amount) * 100}%`;
+
+        await new Promise(r => setTimeout(r, delay));
+      }
+
+      isRunning = false;
+      document.getElementById('startBtn').disabled = false;
+      document.getElementById('stopBtn').disabled = true;
+      log('スレッド作成完了', 'success');
+    }
+
+    async function deleteThread(threadId) {
+      const tokens = document.getElementById('tokenList').value.trim().split('\n').filter(t => t);
+      if (!tokens.length) return;
+      
+      const token = tokens[0].split(':').pop().trim();
+      
+      try {
+        const response = await fetch(`${API_BASE}/channels/${threadId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': token }
+        });
+        
+        if (response.ok) {
+          log(`スレッド削除: ${threadId}`, 'success');
+        }
+      } catch (e) {
+        log(`削除失敗: ${e.message}`, 'error');
+      }
+    }
+
+    async function deleteThreads() {
+      if (!createdThreads.length) {
+        log('削除するスレッドがありません', 'warning');
+        return;
+      }
+
+      log(`${createdThreads.length}個のスレッドを削除します...`, 'info');
+      
+      for (const threadId of createdThreads) {
+        await deleteThread(threadId);
+        await new Promise(r => setTimeout(r, 500));
+      }
+      
+      createdThreads = [];
+      document.getElementById('createdThreads').innerHTML = '';
+      log('全スレッド削除完了', 'success');
+    }
+
+    function stopSpam() {
+      shouldStop = true;
+      isRunning = false;
+      log('停止中...', 'warning');
+    }
+  </script>
+</body>
+</html>
