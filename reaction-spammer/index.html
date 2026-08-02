@@ -221,7 +221,6 @@
           const token = tokenStr.split(':').pop().trim();
           let targetEmoji = useRandom ? emojis[Math.floor(Math.random() * emojis.length)] : emoji;
           
-          // Convert emoji to API format
           if (targetEmoji.includes(':')) {
             targetEmoji = targetEmoji.replace(/:/g, '');
           }
@@ -244,7 +243,6 @@
                   headers: { 'Authorization': token }
                 });
               } else if (currentMode === 'toggle') {
-                // Try to add, if fails (already exists), remove
                 response = await fetch(`${API_BASE}/channels/${channelId}/messages/${messageId}/reactions/${encodedEmoji}/@me`, {
                   method: 'PUT',
                   headers: { 'Authorization': token }
@@ -274,7 +272,6 @@
               log(`エラー: ${e.message}`, 'error');
             }
 
-            // Update progress
             const progress = ((success + failed) / total) * 100;
             document.getElementById('progressFill').style.width = `${progress}%`;
             document.getElementById('successCount').textContent = success;
@@ -286,7 +283,6 @@
         }
       };
 
-      // Split tokens into batches
       const batchSize = Math.ceil(tokens.length / threads);
       const batches = [];
       for (let i = 0; i < threads; i++) {
