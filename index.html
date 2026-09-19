@@ -3,342 +3,294 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShadowTools v2.0 - Discord Arsenal</title>
+    <title>ShadowTools v2.0</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="bg-grid"></div>
-    <div class="particles"></div>
-    <div class="noise"></div>
-
-    <header class="main-header">
-        <div class="logo-container">
-            <div class="logo-icon pulse">
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">
                 <i class="fas fa-skull"></i>
             </div>
             <div class="logo-text">
-                <h1>SHADOW<span class="accent">TOOLS</span></h1>
-                <span class="version">v2.0 PREMIUM</span>
+                <h1>ShadowTools</h1>
+                <span>v2.0</span>
             </div>
         </div>
-        <nav class="header-nav">
-            <a href="#dashboard" class="nav-link active"><i class="fas fa-home"></i> ホーム</a>
-            <a href="#tools" class="nav-link"><i class="fas fa-toolbox"></i> ツール</a>
-            <a href="#settings" class="nav-link"><i class="fas fa-cog"></i> 設定</a>
+        
+        <nav class="nav">
+            <a href="#home" class="nav-item active" onclick="showTab('home')">
+                <i class="fas fa-home"></i>
+                <span>ホーム</span>
+            </a>
+            <a href="#tools" class="nav-item" onclick="showTab('tools')">
+                <i class="fas fa-tools"></i>
+                <span>ツール</span>
+            </a>
         </nav>
-        <div class="header-stats">
-            <div class="stat-item" title="アクティブトークン">
+        
+        <div class="stats">
+            <div class="stat">
                 <i class="fas fa-key"></i>
-                <span id="activeTokens">0</span>
+                <span id="tokenCount">0</span>
             </div>
-            <div class="stat-item" title="送信リクエスト">
-                <i class="fas fa-paper-plane"></i>
-                <span id="requestsSent">0</span>
-            </div>
-            <div class="stat-item" title="稼働時間">
+            <div class="stat">
                 <i class="fas fa-clock"></i>
-                <span id="uptime">00:00:00</span>
+                <span id="uptime">00:00</span>
             </div>
         </div>
     </header>
 
-    <main class="main-container">
-        <aside class="sidebar">
-            <div class="sidebar-section">
-                <h3><i class="fas fa-star"></i> クイックアクセス</h3>
-                <ul class="tool-list">
-                    <li><a href="tools/online/"><i class="fas fa-circle"></i> Token Onliner</a></li>
-                    <li><a href="tools/reaction/"><i class="fas fa-heart"></i> Reaction Spammer</a></li>
-                    <li><a href="tools/nickname/"><i class="fas fa-user-tag"></i> Nickname Changer</a></li>
-                    <li><a href="tools/friend/"><i class="fas fa-user-plus"></i> Friend Spammer</a></li>
-                    <li><a href="tools/thread/"><i class="fas fa-comments"></i> Thread Spammer</a></li>
-                    <li><a href="tools/emoji/"><i class="fas fa-smile"></i> Emoji Stealer</a></li>
-                    <li><a href="tools/voice/"><i class="fas fa-microphone"></i> Voice Joiner</a></li>
-                    <li><a href="tools/clone/"><i class="fas fa-clone"></i> Server Cloner</a></li>
-                    <li><a href="tools/raider/"><i class="fas fa-bomb"></i> Raider</a></li>
-                    <li><a href="tools/dm/"><i class="fas fa-envelope"></i> DM Spammer</a></li>
-                    <li><a href="tools/group-dm/"><i class="fas fa-users"></i> Group DM Spammer</a></li>
-                    <li><a href="tools/invite/"><i class="fas fa-link"></i> Invite Creator</a></li>
-                    <li><a href="tools/nuker/"><i class="fas fa-radiation"></i> Server Nuker</a></li>
-                    <li><a href="tools/webhook/"><i class="fas fa-webhook"></i> Webhook Spammer</a></li>
-                    <li><a href="tools/checker/"><i class="fas fa-check-double"></i> Token Checker</a></li>
-                </ul>
-            </div>
-            <div class="sidebar-section">
-                <h3><i class="fas fa-history"></i> 最近使用</h3>
-                <ul class="recent-list" id="recentTools">
-                    <li class="empty">履歴がありません</li>
-                </ul>
-            </div>
-            <div class="sidebar-section">
-                <h3><i class="fas fa-info-circle"></i> システム情報</h3>
-                <div class="system-info">
-                    <div class="info-row">
-                        <span>バージョン</span>
-                        <span>v2.0.0</span>
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Home Tab -->
+        <section id="home" class="tab active">
+            <!-- Token Manager -->
+            <div class="card token-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-key"></i> トークン管理</h2>
+                    <div class="card-actions">
+                        <button class="btn btn-sm btn-primary" onclick="importTokens()">
+                            <i class="fas fa-file-import"></i> 読込
+                        </button>
+                        <button class="btn btn-sm btn-secondary" onclick="exportTokens()">
+                            <i class="fas fa-file-export"></i> 保存
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="clearTokens()">
+                            <i class="fas fa-trash"></i> 削除
+                        </button>
                     </div>
-                    <div class="info-row">
-                        <span>API</span>
-                        <span class="status online">v9</span>
-                    </div>
-                    <div class="info-row">
-                        <span>WebSocket</span>
-                        <span class="status offline" id="wsStatus">Disconnected</span>
+                </div>
+                <div class="card-body">
+                    <textarea 
+                        id="globalTokens" 
+                        class="token-area" 
+                        placeholder="トークンをここに貼り付け...&#10;1行に1つずつ&#10;形式: token または email:pass:token"
+                    ></textarea>
+                    <div class="token-bar">
+                        <button class="btn btn-primary" onclick="validateTokens()">
+                            <i class="fas fa-check-circle"></i> 検証する
+                        </button>
+                        <span class="token-status" id="tokenStatus">0 個のトークン</span>
                     </div>
                 </div>
             </div>
-        </aside>
 
-        <div class="content-area">
-            <section id="dashboard" class="content-section active">
-                <div class="welcome-banner">
-                    <div class="banner-content">
-                        <h2><i class="fas fa-terminal"></i> ShadowTools v2.0</h2>
-                        <p>高度なDiscord自動化ツールキットへようこそ</p>
-                        <div class="banner-stats">
-                            <div class="banner-stat">
-                                <i class="fas fa-rocket"></i>
-                                <span>高速実行</span>
-                            </div>
-                            <div class="banner-stat">
-                                <i class="fas fa-shield-alt"></i>
-                                <span>安全設計</span>
-                            </div>
-                            <div class="banner-stat">
-                                <i class="fas fa-code"></i>
-                                <span>オープンソース</span>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Quick Tools -->
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-bolt"></i> よく使うツール</h2>
                 </div>
-
-                <div class="panel">
-                    <div class="panel-header">
-                        <h3><i class="fas fa-key"></i> グローバルトークンマネージャー</h3>
-                        <div class="panel-actions">
-                            <button class="btn-icon" onclick="importTokens()" title="インポート"><i class="fas fa-file-import"></i></button>
-                            <button class="btn-icon" onclick="exportTokens()" title="エクスポート"><i class="fas fa-file-export"></i></button>
-                            <button class="btn-icon danger" onclick="clearTokens()" title="クリア"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>
-                    <div class="panel-body">
-                        <textarea id="globalTokens" class="token-input" placeholder="トークンを1行ずつ貼り付け...&#10;フォーマット: token&#10;または: email:password:token"></textarea>
-                        <div class="token-actions">
-                            <button class="btn-primary" onclick="validateTokens()">
-                                <i class="fas fa-check-circle"></i> 検証
-                            </button>
-                            <button class="btn-secondary" onclick="checkAllTokens()">
-                                <i class="fas fa-search"></i> 詳細チェック
-                            </button>
-                            <span class="token-count" id="tokenCount">0 tokens</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tools-section" id="tools">
-                    <h3 class="section-title"><i class="fas fa-th-large"></i> ツール一覧</h3>
-                    <div class="tools-grid">
-                        <a href="tools/online/" class="tool-card">
-                            <div class="tool-icon" style="background: linear-gradient(135deg, #00d4ff, #0099cc);">
-                                <i class="fas fa-circle"></i>
-                            </div>
-                            <div class="tool-info">
-                                <h4>Token Onliner</h4>
-                                <p>トークンをオンライン状態に</p>
-                            </div>
-                        </a>
-                        <a href="tools/raider/" class="tool-card">
-                            <div class="tool-icon" style="background: linear-gradient(135deg, #ff4757, #cc0033);">
+                <div class="card-body">
+                    <div class="quick-grid">
+                        <a href="tools/raider/" class="quick-item">
+                            <div class="quick-icon" style="background: #ff4757;">
                                 <i class="fas fa-bomb"></i>
                             </div>
-                            <div class="tool-info">
-                                <h4>Raider</h4>
-                                <p>チャンネルスパム</p>
-                            </div>
+                            <span>Raider</span>
                         </a>
-                        <a href="tools/dm/" class="tool-card">
-                            <div class="tool-icon" style="background: linear-gradient(135deg, #7bed9f, #2ed573);">
+                        <a href="tools/dm/" class="quick-item">
+                            <div class="quick-icon" style="background: #2ed573;">
                                 <i class="fas fa-envelope"></i>
                             </div>
-                            <div class="tool-info">
-                                <h4>DM Spammer</h4>
-                                <p>DMスパム送信</p>
-                            </div>
+                            <span>DM</span>
                         </a>
-                        <a href="tools/group-dm/" class="tool-card">
-                            <div class="tool-icon" style="background: linear-gradient(135deg, #ffa502, #ff7f00);">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <div class="tool-info">
-                                <h4>Group DM Spammer</h4>
-                                <p>グループDMスパム</p>
-                            </div>
-                        </a>
-                        <a href="tools/webhook/" class="tool-card">
-                            <div class="tool-icon" style="background: linear-gradient(135deg, #a29bfe, #6c5ce7);">
+                        <a href="tools/webhook/" class="quick-item">
+                            <div class="quick-icon" style="background: #a29bfe;">
                                 <i class="fas fa-webhook"></i>
                             </div>
-                            <div class="tool-info">
-                                <h4>Webhook Spammer</h4>
-                                <p>Webhookスパム</p>
-                            </div>
+                            <span>Webhook</span>
                         </a>
-                        <a href="tools/nuker/" class="tool-card">
-                            <div class="tool-icon" style="background: linear-gradient(135deg, #ff6b81, #ff4757);">
+                        <a href="tools/nuker/" class="quick-item">
+                            <div class="quick-icon" style="background: #ff6b81;">
                                 <i class="fas fa-radiation"></i>
                             </div>
-                            <div class="tool-info">
-                                <h4>Server Nuker</h4>
-                                <p>サーバー破壊</p>
-                            </div>
-                        </a>
-                        <a href="tools/clone/" class="tool-card">
-                            <div class="tool-icon" style="background: linear-gradient(135deg, #74b9ff, #0984e3);">
-                                <i class="fas fa-clone"></i>
-                            </div>
-                            <div class="tool-info">
-                                <h4>Server Cloner</h4>
-                                <p>サーバー複製</p>
-                            </div>
-                        </a>
-                        <a href="tools/reaction/" class="tool-card">
-                            <div class="tool-icon" style="background: linear-gradient(135deg, #fd79a8, #e84393);">
-                                <i class="fas fa-heart"></i>
-                            </div>
-                            <div class="tool-info">
-                                <h4>Reaction Spammer</h4>
-                                <p>リアクションスパム</p>
-                            </div>
-                        </a>
-                        <a href="tools/nickname/" class="tool-card">
-                            <div class="tool-icon" style="background: linear-gradient(135deg, #00b894, #00cec9);">
-                                <i class="fas fa-user-tag"></i>
-                            </div>
-                            <div class="tool-info">
-                                <h4>Nickname Changer</h4>
-                                <p>ニックネーム変更</p>
-                            </div>
-                        </a>
-                        <a href="tools/friend/" class="tool-card">
-                            <div class="tool-icon" style="background: linear-gradient(135deg, #e17055, #d63031);">
-                                <i class="fas fa-user-plus"></i>
-                            </div>
-                            <div class="tool-info">
-                                <h4>Friend Spammer</h4>
-                                <p>フレンドスパム</p>
-                            </div>
-                        </a>
-                        <a href="tools/thread/" class="tool-card">
-                            <div class="tool-icon" style="background: linear-gradient(135deg, #81ecec, #00cec9);">
-                                <i class="fas fa-comments"></i>
-                            </div>
-                            <div class="tool-info">
-                                <h4>Thread Spammer</h4>
-                                <p>スレッドスパム</p>
-                            </div>
-                        </a>
-                        <a href="tools/emoji/" class="tool-card">
-                            <div class="tool-icon" style="background: linear-gradient(135deg, #ffeaa7, #fdcb6e);">
-                                <i class="fas fa-smile"></i>
-                            </div>
-                            <div class="tool-info">
-                                <h4>Emoji Stealer</h4>
-                                <p>絵文字コピー</p>
-                            </div>
-                        </a>
-                        <a href="tools/voice/" class="tool-card">
-                            <div class="tool-icon" style="background: linear-gradient(135deg, #dfe6e9, #b2bec3);">
-                                <i class="fas fa-microphone"></i>
-                            </div>
-                            <div class="tool-info">
-                                <h4>Voice Joiner</h4>
-                                <p>ボイスチャンネル参加</p>
-                            </div>
-                        </a>
-                        <a href="tools/invite/" class="tool-card">
-                            <div class="tool-icon" style="background: linear-gradient(135deg, #55efc4, #00b894);">
-                                <i class="fas fa-link"></i>
-                            </div>
-                            <div class="tool-info">
-                                <h4>Invite Creator</h4>
-                                <p>招待リンク作成</p>
-                            </div>
-                        </a>
-                        <a href="tools/checker/" class="tool-card">
-                            <div class="tool-icon" style="background: linear-gradient(135deg, #a29bfe, #6c5ce7);">
-                                <i class="fas fa-check-double"></i>
-                            </div>
-                            <div class="tool-info">
-                                <h4>Token Checker</h4>
-                                <p>トークン検証</p>
-                            </div>
+                            <span>Nuker</span>
                         </a>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <section id="settings" class="content-section">
-                <div class="panel">
-                    <div class="panel-header">
-                        <h3><i class="fas fa-cog"></i> 設定</h3>
+        <!-- Tools Tab -->
+        <section id="tools" class="tab">
+            <div class="tools-grid">
+                <a href="tools/online/" class="tool-item">
+                    <div class="tool-icon" style="background: linear-gradient(135deg, #00d4ff, #0099cc);">
+                        <i class="fas fa-circle"></i>
                     </div>
-                    <div class="panel-body">
-                        <div class="setting-item">
-                            <label>APIバージョン</label>
-                            <select id="apiVersion">
-                                <option value="9" selected>v9</option>
-                                <option value="10">v10</option>
-                            </select>
-                        </div>
-                        <div class="setting-item">
-                            <label>プロキシ</label>
-                            <textarea id="proxyList" placeholder="http://proxy:port&#10;複数入力可"></textarea>
-                        </div>
-                        <div class="settings-actions">
-                            <button class="btn-primary" onclick="saveSettings()">
-                                <i class="fas fa-save"></i> 保存
-                            </button>
-                            <button class="btn-secondary" onclick="resetSettings()">
-                                <i class="fas fa-undo"></i> リセット
-                            </button>
-                            <button class="btn-secondary" onclick="exportSettings()">
-                                <i class="fas fa-file-export"></i> エクスポート
-                            </button>
-                        </div>
+                    <div class="tool-details">
+                        <h3>Token Onliner</h3>
+                        <p>オンライン状態にする</p>
                     </div>
-                </div>
-            </section>
-        </div>
+                    <i class="fas fa-chevron-right tool-arrow"></i>
+                </a>
+
+                <a href="tools/raider/" class="tool-item">
+                    <div class="tool-icon" style="background: linear-gradient(135deg, #ff4757, #cc0033);">
+                        <i class="fas fa-bomb"></i>
+                    </div>
+                    <div class="tool-details">
+                        <h3>Raider</h3>
+                        <p>チャンネルスパム</p>
+                    </div>
+                    <i class="fas fa-chevron-right tool-arrow"></i>
+                </a>
+
+                <a href="tools/dm/" class="tool-item">
+                    <div class="tool-icon" style="background: linear-gradient(135deg, #2ed573, #26af61);">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="tool-details">
+                        <h3>DM Spammer</h3>
+                        <p>DM送信</p>
+                    </div>
+                    <i class="fas fa-chevron-right tool-arrow"></i>
+                </a>
+
+                <a href="tools/group-dm/" class="tool-item">
+                    <div class="tool-icon" style="background: linear-gradient(135deg, #ffa502, #ff7f00);">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="tool-details">
+                        <h3>Group DM</h3>
+                        <p>グループDMスパム</p>
+                    </div>
+                    <i class="fas fa-chevron-right tool-arrow"></i>
+                </a>
+
+                <a href="tools/webhook/" class="tool-item">
+                    <div class="tool-icon" style="background: linear-gradient(135deg, #a29bfe, #6c5ce7);">
+                        <i class="fas fa-webhook"></i>
+                    </div>
+                    <div class="tool-details">
+                        <h3>Webhook</h3>
+                        <p>Webhookスパム</p>
+                    </div>
+                    <i class="fas fa-chevron-right tool-arrow"></i>
+                </a>
+
+                <a href="tools/nuker/" class="tool-item">
+                    <div class="tool-icon" style="background: linear-gradient(135deg, #ff6b81, #ff4757);">
+                        <i class="fas fa-radiation"></i>
+                    </div>
+                    <div class="tool-details">
+                        <h3>Server Nuker</h3>
+                        <p>サーバー破壊</p>
+                    </div>
+                    <i class="fas fa-chevron-right tool-arrow"></i>
+                </a>
+
+                <a href="tools/clone/" class="tool-item">
+                    <div class="tool-icon" style="background: linear-gradient(135deg, #74b9ff, #0984e3);">
+                        <i class="fas fa-clone"></i>
+                    </div>
+                    <div class="tool-details">
+                        <h3>Server Cloner</h3>
+                        <p>サーバー複製</p>
+                    </div>
+                    <i class="fas fa-chevron-right tool-arrow"></i>
+                </a>
+
+                <a href="tools/reaction/" class="tool-item">
+                    <div class="tool-icon" style="background: linear-gradient(135deg, #fd79a8, #e84393);">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="tool-details">
+                        <h3>Reaction</h3>
+                        <p>リアクションスパム</p>
+                    </div>
+                    <i class="fas fa-chevron-right tool-arrow"></i>
+                </a>
+
+                <a href="tools/nickname/" class="tool-item">
+                    <div class="tool-icon" style="background: linear-gradient(135deg, #00b894, #00cec9);">
+                        <i class="fas fa-user-tag"></i>
+                    </div>
+                    <div class="tool-details">
+                        <h3>Nickname</h3>
+                        <p>ニックネーム変更</p>
+                    </div>
+                    <i class="fas fa-chevron-right tool-arrow"></i>
+                </a>
+
+                <a href="tools/friend/" class="tool-item">
+                    <div class="tool-icon" style="background: linear-gradient(135deg, #e17055, #d63031);">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="tool-details">
+                        <h3>Friend</h3>
+                        <p>フレンドスパム</p>
+                    </div>
+                    <i class="fas fa-chevron-right tool-arrow"></i>
+                </a>
+
+                <a href="tools/thread/" class="tool-item">
+                    <div class="tool-icon" style="background: linear-gradient(135deg, #81ecec, #00cec9);">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="tool-details">
+                        <h3>Thread</h3>
+                        <p>スレッドスパム</p>
+                    </div>
+                    <i class="fas fa-chevron-right tool-arrow"></i>
+                </a>
+
+                <a href="tools/emoji/" class="tool-item">
+                    <div class="tool-icon" style="background: linear-gradient(135deg, #ffeaa7, #fdcb6e);">
+                        <i class="fas fa-smile"></i>
+                    </div>
+                    <div class="tool-details">
+                        <h3>Emoji</h3>
+                        <p>絵文字コピー</p>
+                    </div>
+                    <i class="fas fa-chevron-right tool-arrow"></i>
+                </a>
+
+                <a href="tools/voice/" class="tool-item">
+                    <div class="tool-icon" style="background: linear-gradient(135deg, #dfe6e9, #b2bec3);">
+                        <i class="fas fa-microphone"></i>
+                    </div>
+                    <div class="tool-details">
+                        <h3>Voice</h3>
+                        <p>ボイス参加</p>
+                    </div>
+                    <i class="fas fa-chevron-right tool-arrow"></i>
+                </a>
+
+                <a href="tools/invite/" class="tool-item">
+                    <div class="tool-icon" style="background: linear-gradient(135deg, #55efc4, #00b894);">
+                        <i class="fas fa-link"></i>
+                    </div>
+                    <div class="tool-details">
+                        <h3>Invite</h3>
+                        <p>招待リンク作成</p>
+                    </div>
+                    <i class="fas fa-chevron-right tool-arrow"></i>
+                </a>
+
+                <a href="tools/checker/" class="tool-item">
+                    <div class="tool-icon" style="background: linear-gradient(135deg, #a29bfe, #6c5ce7);">
+                        <i class="fas fa-check-double"></i>
+                    </div>
+                    <div class="tool-details">
+                        <h3>Checker</h3>
+                        <p>トークン検証</p>
+                    </div>
+                    <i class="fas fa-chevron-right tool-arrow"></i>
+                </a>
+            </div>
+        </section>
     </main>
 
-    <div class="log-panel" id="logPanel">
-        <div class="log-header">
-            <span><i class="fas fa-list"></i> ログ</span>
-            <button onclick="clearLogs()" title="クリア"><i class="fas fa-eraser"></i></button>
-        </div>
-        <div class="log-body" id="systemLog">
-            <div class="log-entry log-info">
-                <span class="log-time">[--:--:--]</span> ShadowTools v2.0 initialized
-            </div>
-        </div>
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMsg">メッセージ</span>
     </div>
-
-    <footer class="main-footer">
-        <div class="footer-content">
-            <div class="footer-left">
-                <span>ShadowTools v2.0</span>
-                <span class="divider">|</span>
-                <span>Made with <i class="fas fa-skull"></i> by Shadow Team</span>
-            </div>
-            <div class="footer-right">
-                <a href="#" onclick="showHelp(); return false;"><i class="fas fa-question-circle"></i> ヘルプ</a>
-                <a href="#" onclick="showAbout(); return false;"><i class="fas fa-info-circle"></i> About</a>
-                <a href="https://github.com" target="_blank"><i class="fab fa-github"></i> GitHub</a>
-            </div>
-        </div>
-    </footer>
 
     <script src="app.js"></script>
 </body>
