@@ -178,6 +178,7 @@ const ShadowApp = {
             }
         }
     },
+    // 欠落していたオブジェクトを追加
     stats: {
         update: () => {
             const elapsed = Math.floor((Date.now() - ShadowApp.state.startTime) / 1000);
