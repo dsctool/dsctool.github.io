@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Friend Spammer - ShadowTools</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="tool-container">
+    <div class="tool-header">
+      <h1><i class="fas fa-user-plus"></i> Friend Spammer</h1>
+      <p>フレンド申請の自動送信</p>
+    </div>
+
+    <div class="tool-panel">
+      <div class="input-method">
+        <h3><i class="fas fa-crosshairs"></i> ターゲット指定方法</h3>
+        <div class="method-tabs">
+          <button class="method-btn active" onclick="setMethod('username')">
+            <i class="fas fa-user"></i> ユーザー名
+          </button>
+          <button class="method-btn" onclick="setMethod('id')">
+            <i class="fas fa-fingerprint"></i> ユーザーID
+          </button>
+          <button class="method-btn" onclick="setMethod('scraped')">
+            <i class="fas fa-database"></i> スクレイピング
+          </button>
+        </div>
+      </div>
+
+      <div class="input-section" id="usernameSection">
+        <div class="input-group">
+          <label><i class="fas fa-users"></i> ターゲットユーザー名</label>
+          <textarea id="usernames" placeholder="username#0000&#10;複数入力可"></textarea>
+          <small>フォーマット: username#discriminator</small>
+        </div>
+      </div>
+
+      <div class="input-section" id="idSection" style="display: none;">
+        <div class="input-group">
+          <label><i class="fas fa-fingerprint"></i> ユーザーID</label>
+          <textarea id="userIds" placeholder="123456789012345678&#10;複数入力可"></textarea>
+        </div>
+      </div>
+
+      <div class="input-section" id="scrapedSection" style="display: none;">
+        <div class="input-group">
+          <label><i class="fas fa-server"></i> ソースサーバー</label>
+          <input type="text" id="sourceGuild" placeholder="サーバーID">
+          <button class="btn-secondary" onclick="scrapeMembers()">
+            <i class="fas fa-search"></i> メンバースクレイピング
+          </button>
+        </div>
+        <div class="scraped-users" id="scrapedUsers"></div>
+      </div>
+
+      <div class="message-section">
+        <label><input type="checkbox" id="includeMessage" onchange="toggleMessage()"> メッセージを添付</label>
+        <div class="input-group" id="messageGroup" style="display: none;">
+          <label><i class="fas fa-comment"></i> フレンド申請メッセージ</label>
+          <input type="text" id="friendMessage" placeholder="こんにちは！フレンドになってください。" maxlength="100">
+          <small>最大100文字</small>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label><i class="fas fa-key"></i> トークン</label>
+        <textarea id="tokenList" placeholder="トークンを1行ずつ入力..."></textarea>
+      </div>
+
+      <div class="config-grid">
+        <div class="input-group">
+          <label><i class="fas fa-redo"></i> 試行回数/ユーザー</label>
+          <input type="number" id="retries" value="1" min="1" max="5">
+        </div>
+        <div class="input-group">
+          <label><i class="fas fa-clock"></i> 遅延 (ms)</label>
+          <input type="number" id="delay" value="5000" min="1000">
+        </div>
+        <div class="input-group">
+          <label><i class="fas fa-bolt"></i> 並列数</label>
+          <input type="number" id="threads" value="3" min="1" max="10">
+        </div>
+      </div>
+
+      <div class="options-section">
+        <label><input type="checkbox" id="skipExisting"> 既存フレンドをスキップ</label>
+        <label><input type="checkbox" id="randomizeDelay"> ランダム遅延</label>
+        <label><input type="checkbox" id="rotateTokens"> トークン循環</label>
+      </div>
+
+      <div class="button-group">
+        <button class="btn-primary btn-large" id="startBtn" onclick="startSpam()">
+          <i class="fas fa-paper-plane"></i> 送信開始
+        </button>
+        <button class="btn-danger" id="stopBtn" onclick="stopSpam()" disabled>
+          <i class="fas fa-stop"></i> 停止
+        </button>
+        <button class="btn-secondary" onclick="clearAll()">
+          <i class="fas fa-trash"></i> クリア
+        </button>
+      </div>
+
+      <div class="progress-section">
+        <div class="progress-info">
+          <span>進捗: <b id="progressText">0/0</b></span>
+          <span>成功: <b id="successCount" class="success">0</b></span>
+          <span>失敗: <b id="failCount" class="error">0</b></span>
+          <span>既存: <b id="existingCount">0</b></span>
+        </div>
+        <div class="progress-bar">
+          <div id="progressFill"></div>
+        </div>
+      </div>
+
+      <div class="results-table" id="resultsTable">
+        <table>
+          <thead>
+            <tr>
+              <th>ユーザー</th>
+              <th>状態</th>
+              <th>時間</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
+
+      <div class="console-output" id="console"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'https://discord.com/api/v9';
+    let currentMethod = 'username';
+    let isRunning = false;
+    let shouldStop = false;
+
+    function log(message, type = 'info') {
+      const console = document.getElementById('console');
+      const time = new Date().toLocaleTimeString();
+      const div = document.createElement('div');
+      div.className = `log-entry log-${type}`;
+      div.innerHTML = `<span class="log-time">[${time}]</span> ${message}`;
+      console.appendChild(div);
+      console.scrollTop = console.scrollHeight;
+    }
+
+    function setMethod(method) {
+      currentMethod = method;
+      document.querySelectorAll('.method-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.input-section').forEach(sec => sec.style.display = 'none');
+      
+      event.target.closest('.method-btn').classList.add('active');
+      document.getElementById(method + 'Section').style.display = 'block';
+    }
+
+    function toggleMessage() {
+      document.getElementById('messageGroup').style.display = 
+        document.getElementById('includeMessage').checked ? 'block' : 'none';
+    }
+
+    async function scrapeMembers() {
+      const guildId = document.getElementById('sourceGuild').value.trim();
+      const tokens = document.getElementById('tokenList').value.trim().split('\n').filter(t => t);
+      
+      if (!guildId || !tokens.length) {
+        log('サーバーIDとトークンを入力してください', 'error');
+        return;
+      }
+
+      log('メンバースクレイピング開始...', 'info');
+      
+      try {
+        const token = tokens[0].split(':').pop().trim();
+        const response = await fetch(`${API_BASE}/guilds/${guildId}/members?limit=1000`, {
+          headers: { 'Authorization': token }
+        });
+        
+        if (response.ok) {
+          const members = await response.json();
+          const container = document.getElementById('scrapedUsers');
+          container.innerHTML = members.map(m => `
+            <label class="user-checkbox">
+              <input type="checkbox" value="${m.user.id}" checked>
+              <img src="${m.user.avatar ? `https://cdn.discordapp.com/avatars/${m.user.id}/${m.user.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png'}" width="24">
+              ${m.user.username}#${m.user.discriminator}
+            </label>
+          `).join('');
+          
+          log(`${members.length}人のメンバーを取得しました`, 'success');
+        }
+      } catch (e) {
+        log(`エラー: ${e.message}`, 'error');
+      }
+    }
+
+    async function startSpam() {
+      const tokens = document.getElementById('tokenList').value.trim().split('\n').filter(t => t);
+      const retries = parseInt(document.getElementById('retries').value) || 1;
+      const delay = parseInt(document.getElementById('delay').value) || 5000;
+      const threads = parseInt(document.getElementById('threads').value) || 3;
+      const includeMsg = document.getElementById('includeMessage').checked;
+      const message = document.getElementById('friendMessage').value;
+
+      if (!tokens.length) {
+        log('トークンを入力してください', 'error');
+        return;
+      }
+
+      let targets = [];
+      
+      if (currentMethod === 'username') {
+        targets = document.getElementById('usernames').value.trim().split('\n').filter(u => u);
+      } else if (currentMethod === 'id') {
+        targets = document.getElementById('userIds').value.trim().split('\n').filter(u => u);
+      } else if (currentMethod === 'scraped') {
+        const checkboxes = document.querySelectorAll('.user-checkbox input:checked');
+        targets = Array.from(checkboxes).map(cb => cb.value);
+      }
+
+      if (!targets.length) {
+        log('ターゲットを入力してください', 'error');
+        return;
+      }
+
+      isRunning = true;
+      shouldStop = false;
+      document.getElementById('startBtn').disabled = true;
+      document.getElementById('stopBtn').disabled = false;
+
+      let success = 0, failed = 0, existing = 0;
+      const total = targets.length * retries;
+
+      log(`${targets.length}人にフレンド申請を送信します...`, 'info');
+
+      for (let i = 0; i < retries; i++) {
+        if (shouldStop) break;
+        
+        for (let j = 0; j < targets.length; j++) {
+          if (shouldStop) break;
+          
+          const target = targets[j];
+          const token = tokens[j % tokens.length].split(':').pop().trim();
+          
+          try {
+            let response;
+            
+            if (currentMethod === 'username') {
+              const [username, discriminator] = target.split('#');
+              response = await fetch(`${API_BASE}/users/@me/relationships`, {
+                method: 'POST',
+                headers: {
+                  'Authorization': token,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  username: username,
+                  discriminator: parseInt(discriminator) || 0
+                })
+              });
+            } else {
+              // ID-based friend request (requires different endpoint or user lookup)
+              response = await fetch(`${API_BASE}/users/@me/relationships`, {
+                method: 'PUT',
+                headers: { 'Authorization': token },
+                body: JSON.stringify({ id: target })
+              });
+            }
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${target}</td>
+              <td class="${response.ok ? 'success' : 'error'}">${response.ok ? '成功' : '失敗'}</td>
+              <td>${new Date().toLocaleTimeString()}</td>
+            `;
+            document.getElementById('resultsBody').appendChild(row);
+
+            if (response.ok) {
+              success++;
+              log(`フレンド申請成功: ${target}`, 'success');
+            } else if (response.status === 204) {
+              existing++;
+              log(`既にフレンド: ${target}`, 'warning');
+            } else {
+              failed++;
+              log(`失敗: ${target} (${response.status})`, 'error');
+              if (response.status === 429) {
+                await new Promise(r => setTimeout(r, 10000));
+              }
+            }
+          } catch (e) {
+            failed++;
+            log(`エラー: ${e.message}`, 'error');
+          }
+
+          // Update progress
+          const current = i * targets.length + j + 1;
+          document.getElementById('progressText').textContent = `${current}/${total}`;
+          document.getElementById('successCount').textContent = success;
+          document.getElementById('failCount').textContent = failed;
+          document.getElementById('existingCount').textContent = existing;
+          document.getElementById('progressFill').style.width = `${(current / total) * 100}%`;
+
+          const actualDelay = document.getElementById('randomizeDelay').checked ? 
+            delay + Math.random() * 2000 : delay;
+          await new Promise(r => setTimeout(r, actualDelay));
+        }
+      }
+
+      isRunning = false;
+      document.getElementById('startBtn').disabled = false;
+      document.getElementById('stopBtn').disabled = true;
+      log('フレンド申請完了', 'success');
+    }
+
+    function stopSpam() {
+      shouldStop = true;
+      isRunning = false;
+      log('停止中...', 'warning');
+    }
+
+    function clearAll() {
+      document.getElementById('usernames').value = '';
+      document.getElementById('userIds').value = '';
+      document.getElementById('tokenList').value = '';
+      document.getElementById('resultsBody').innerHTML = '';
+      document.getElementById('progressFill').style.width = '0%';
+      document.getElementById('progressText').textContent = '0/0';
+      document.getElementById('successCount').textContent = '0';
+      document.getElementById('failCount').textContent = '0';
+      document.getElementById('existingCount').textContent = '0';
+      log('クリアしました', 'info');
+    }
+  </script>
+</body>
+</html>

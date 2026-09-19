@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Webhook Spammer - ShadowTools</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Share Tech Mono', monospace;
+      background: #050510;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #e0e0ff;
+      overflow: hidden;
+    }
+    
+    /* Animated background */
+    .bg-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(255, 0, 128, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(0, 255, 255, 0.15) 0%, transparent 50%);
+      z-index: -1;
+    }
+    
+    .container {
+      width: 90%;
+      max-width: 600px;
+      background: rgba(10, 10, 25, 0.95);
+      border: 1px solid #ff0080;
+      border-radius: 15px;
+      padding: 40px;
+      box-shadow: 
+        0 0 50px rgba(255, 0, 128, 0.2),
+        inset 0 0 50px rgba(255, 0, 128, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .container::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, #ff0080, #00ffff, #ff0080);
+      border-radius: 15px;
+      opacity: 0.3;
+      z-index: -1;
+      filter: blur(10px);
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      position: relative;
+    }
+    
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #ff0080, transparent);
+    }
+    
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2rem;
+      color: #ff0080;
+      text-shadow: 0 0 20px rgba(255, 0, 128, 0.5);
+      letter-spacing: 3px;
+    }
+    
+    .subtitle {
+      color: #00ffff;
+      font-size: 0.9rem;
+      margin-top: 5px;
+      text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    }
+    
+    .form-group {
+      margin-bottom: 25px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #ff0080;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: bold;
+    }
+    
+    input, textarea {
+      width: 100%;
+      padding: 12px 15px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: #00ffff;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.95rem;
+      transition: all 0.3s;
+    }
+    
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #ff0080;
+      box-shadow: 0 0 15px rgba(255, 0, 128, 0.3);
+    }
+    
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+    }
+    
+    .btn {
+      flex: 1;
+      padding: 15px;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #ff0080, #ff4080);
+      color: #fff;
+      box-shadow: 0 5px 20px rgba(255, 0, 128, 0.4);
+    }
+    
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(255, 0, 128, 0.6);
+    }
+    
+    .btn-secondary {
+      background: linear-gradient(135deg, #00ffff, #00cccc);
+      color: #000;
+      box-shadow: 0 5px 20px rgba(0, 255, 255, 0.4);
+    }
+    
+    .btn-secondary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0, 255, 255, 0.6);
+    }
+    
+    .btn:disabled {
+      background: #333;
+      color: #666;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+    
+    .status {
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid #333;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      min-height: 100px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .status-line {
+      margin: 5px 0;
+      padding-left: 15px;
+      position: relative;
+    }
+    
+    .status-line::before {
+      content: '>';
+      position: absolute;
+      left: 0;
+      color: #ff0080;
+    }
+    
+    .success { color: #00ff80; }
+    .error { color: #ff0040; }
+    .info { color: #00ffff; }
+    
+    @media (max-width: 600px) {
+      .button-group {
+        flex-direction: column;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-animation"></div>
+  
+  <div class="container">
+    <div class="header">
+      <h1>WEBHOOK SPAMMER</h1>
+      <div class="subtitle">High-Frequency Message Injection</div>
+    </div>
+    
+    <form id="webhookForm">
+      <div class="form-group">
+        <label>Bot Token</label>
+        <input type="password" id="token" placeholder="Enter token..." required>
+      </div>
+      
+      <div class="form-group">
+        <label>Server ID</label>
+        <input type="text" id="guildId" placeholder="1362131922347622462" required>
+      </div>
+      
+      <div class="form-group">
+        <label>Webhook Name</label>
+        <input type="text" id="webhookName" placeholder="Captain Hook" value="ShadowHook">
+      </div>
+      
+      <div class="form-group">
+        <label>Message Content</label>
+        <textarea id="message" placeholder="@everyone Server compromised..." required></textarea>
+      </div>
+      
+      <div class="button-group">
+        <button type="submit" class="btn btn-primary" id="submitBtn">EXECUTE</button>
+        <button type="button" class="btn btn-secondary" id="stopBtn" disabled>ABORT</button>
+      </div>
+    </form>
+    
+    <div class="status" id="log">
+      <div class="status-line info">System ready...</div>
+    </div>
+  </div>
+  
+  <script>
+    // Use the existing obfuscated script but update the UI interactions
+    const originalScript = document.createElement('script');
+    originalScript.src = 'script.js';
+    document.body.appendChild(originalScript);
+    
+    // Enhanced UI logging
+    const log = (msg, type = 'info') => {
+      const logEl = document.getElementById('log');
+      const line = document.createElement('div');
+      line.className = `status-line ${type}`;
+      line.textContent = msg;
+      logEl.appendChild(line);
+      logEl.scrollTop = logEl.scrollHeight;
+    };
+    
+    // Override the original Xil3_z function to update UI
+    window.addEventListener('load', () => {
+      const submitBtn = document.getElementById('submitBtn');
+      const stopBtn = document.getElementById('stopBtn');
+      
+      document.getElementById('webhookForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        submitBtn.disabled = true;
+        stopBtn.disabled = false;
+        log('Initializing webhook creation...', 'info');
+      });
+      
+      document.getElementById('stopBtn').addEventListener('click', () => {
+        submitBtn.disabled = false;
+        stopBtn.disabled = true;
+        log('Operation aborted by user', 'error');
+      });
+    });
+  </script>
+</body>
+</html>

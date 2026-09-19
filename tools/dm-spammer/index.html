@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DM Spammer - ShadowTools</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #e0e0ff;
+    }
+    
+    .container {
+      width: 90%;
+      max-width: 700px;
+      background: rgba(20, 20, 40, 0.9);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 
+        0 20px 60px rgba(75, 0, 130, 0.4),
+        0 0 0 1px rgba(138, 43, 226, 0.3);
+      border: 1px solid rgba(138, 43, 226, 0.5);
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      background: linear-gradient(90deg, #8a2be2, #da70d6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px rgba(138, 43, 226, 0.5);
+      letter-spacing: 3px;
+    }
+    
+    .subtitle {
+      color: #da70d6;
+      font-size: 1rem;
+      margin-top: 10px;
+    }
+    
+    .form-group {
+      margin-bottom: 25px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #da70d6;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    input, textarea {
+      width: 100%;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid #4b0082;
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+    
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #da70d6;
+      box-shadow: 0 0 20px rgba(218, 112, 214, 0.3);
+    }
+    
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+    
+    .stat-box {
+      background: rgba(75, 0, 130, 0.2);
+      border: 1px solid #4b0082;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #da70d6;
+    }
+    
+    .stat-label {
+      font-size: 0.8rem;
+      color: #9370db;
+      text-transform: uppercase;
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 18px;
+      background: linear-gradient(135deg, #8a2be2, #da70d6);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      box-shadow: 0 5px 20px rgba(138, 43, 226, 0.4);
+    }
+    
+    .btn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(138, 43, 226, 0.6);
+    }
+    
+    .btn:disabled {
+      background: #444;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    
+    .btn.stop {
+      background: linear-gradient(135deg, #ff0040, #ff4080);
+      margin-top: 10px;
+    }
+    
+    .log {
+      margin-top: 25px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid #4b0082;
+      border-radius: 10px;
+      padding: 20px;
+      height: 250px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 0.9rem;
+    }
+    
+    .log-entry {
+      margin: 5px 0;
+      padding: 5px;
+      border-left: 3px solid #4b0082;
+      padding-left: 10px;
+    }
+    
+    .success { border-left-color: #00ff80; color: #00ff80; }
+    .error { border-left-color: #ff0040; color: #ff0040; }
+    .pending { border-left-color: #ffd700; color: #ffd700; }
+    
+    @media (max-width: 600px) {
+      .stats {
+        grid-template-columns: 1fr;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>DM SPAMMER</h1>
+      <div class="subtitle">Direct Message Mass Sender</div>
+    </div>
+    
+    <form id="dmForm">
+      <div class="form-group">
+        <label>Token</label>
+        <input type="password" id="token" placeholder="Enter your Discord token" required>
+      </div>
+      
+      <div class="form-group">
+        <label>Target User IDs (one per line or comma separated)</label>
+        <textarea id="userIds" placeholder="123456789&#10;987654321" required></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label>Message Content</label>
+        <textarea id="message" placeholder="Enter message to send..." required></textarea>
+      </div>
+      
+      <div class="stats">
+        <div class="stat-box">
+          <div class="stat-value" id="totalCount">0</div>
+          <div class="stat-label">Targets</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="successCount">0</div>
+          <div class="stat-label">Sent</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="failCount">0</div>
+          <div class="stat-label">Failed</div>
+        </div>
+      </div>
+      
+      <button type="submit" class="btn" id="startBtn">START SPAMMING</button>
+      <button type="button" class="btn stop" id="stopBtn" disabled>STOP</button>
+    </form>
+    
+    <div class="log" id="log"></div>
+  </div>
+  
+  <script>
+    const API_BASE = 'https://discord.com/api/v9';
+    let isRunning = false;
+    let abortController = null;
+    
+    const updateStats = () => {
+      const users = document.getElementById('userIds').value
+        .split(/[\n,]+/)
+        .map(id => id.trim())
+        .filter(id => id);
+      document.getElementById('totalCount').textContent = [...new Set(users)].length;
+    };
+    
+    document.getElementById('userIds').addEventListener('input', updateStats);
+    
+    const log = (msg, type = 'info') => {
+      const logEl = document.getElementById('log');
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      logEl.insertBefore(entry, logEl.firstChild);
+    };
+    
+    async function createDMChannel(userId, token) {
+      const response = await fetch(`${API_BASE}/users/@me/channels`, {
+        method: 'POST',
+        headers: {
+          'Authorization': token,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ recipient_id: userId })
+      });
+      
+      if (!response.ok) throw new Error('Failed to create DM');
+      return response.json();
+    }
+    
+    async function sendMessage(channelId, content, token) {
+      const response = await fetch(`${API_BASE}/channels/${channelId}/messages`, {
+        method: 'POST',
+        headers: {
+          'Authorization': token,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ content })
+      });
+      return response;
+    }
+    
+    document.getElementById('dmForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (isRunning) return;
+      
+      const token = document.getElementById('token').value;
+      const userIds = [...new Set(
+        document.getElementById('userIds').value
+          .split(/[\n,]+/)
+          .map(id => id.trim())
+          .filter(id => id)
+      )];
+      const message = document.getElementById('message').value;
+      
+      if (userIds.length === 0) {
+        log('No valid user IDs found', 'error');
+        return;
+      }
+      
+      isRunning = true;
+      abortController = new AbortController();
+      document.getElementById('startBtn').disabled = true;
+      document.getElementById('stopBtn').disabled = false;
+      
+      let success = 0;
+      let failed = 0;
+      
+      log(`Starting DM spam to ${userIds.length} users...`, 'info');
+      
+      for (const userId of userIds) {
+        if (!isRunning) break;
+        
+        try {
+          log(`Creating DM channel with ${userId}...`, 'pending');
+          const channel = await createDMChannel(userId, token);
+          
+          log(`Sending message to ${userId}...`, 'pending');
+          const res = await sendMessage(channel.id, message, token);
+          
+          if (res.ok) {
+            success++;
+            log(`Message sent to ${userId}`, 'success');
+          } else {
+            failed++;
+            log(`Failed to send to ${userId}: ${res.status}`, 'error');
+          }
+          
+          document.getElementById('successCount').textContent = success;
+          document.getElementById('failCount').textContent = failed;
+          
+          // Rate limit delay
+          await new Promise(r => setTimeout(r, 1000));
+          
+        } catch (err) {
+          failed++;
+          log(`Error with ${userId}: ${err.message}`, 'error');
+          document.getElementById('failCount').textContent = failed;
+        }
+      }
+      
+      log(`Complete! Success: ${success}, Failed: ${failed}`, 'info');
+      isRunning = false;
+      document.getElementById('startBtn').disabled = false;
+      document.getElementById('stopBtn').disabled = true;
+    });
+    
+    document.getElementById('stopBtn').addEventListener('click', () => {
+      isRunning = false;
+      log('Stopping...', 'info');
+      document.getElementById('startBtn').disabled = false;
+      document.getElementById('stopBtn').disabled = true;
+    });
+  </script>
+</body>
+</html>
